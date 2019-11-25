@@ -1,8 +1,10 @@
 package com.andromedacodelab.HighCbaCamp.model;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import org.springframework.data.web.JsonPath;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -39,6 +41,7 @@ public class Reservation {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "\"STATUS_ID\"")
+    @JsonRawValue
     private ReservationStatus status;
 
     @ManyToMany
