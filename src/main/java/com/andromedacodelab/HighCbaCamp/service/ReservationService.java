@@ -7,6 +7,7 @@ import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -35,6 +36,10 @@ public class ReservationService {
         Guest guest = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
                 .withEmail(email).withIsReservationHolder(true).build();
         companions.add(guest);
+        // TODO check if the guests already exist in the DB, if not create them with GuestService
+        // TODO check if the provided date range is available to create a reservation
+        // TODO validate if the reservation is made one day ahead of selected start date
+        // TODO validate if the reservation does not lasts more than one month
         Reservation reservation = new ReservationBuilder().withArrivalDate(arrival)
                 .withDepartureDate(departure).withCompanions(companions).build();
         try {
@@ -43,5 +48,20 @@ public class ReservationService {
             throw new RuntimeException("Reservation could not be created");
         }
         return reservation;
+    }
+
+    public Reservation updateReservation(Reservation reservation, int bookingId) {
+
+        // TODO validate if the guests are all the same. If not remove/add the existing.
+
+        return new Reservation();
+    }
+
+    public void delete(int id) {
+        reservationRepository.deleteById(id);
+    }
+
+    private void updateGuests(Set<Guest> newGuests, Set<Guest> oldGuests) {
+
     }
 }

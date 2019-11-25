@@ -6,6 +6,7 @@ import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,5 +42,19 @@ public class ReservationController {
                                          LocalDateTime arrival, LocalDateTime departure,
                                          Set<Guest> companions) {
         return reservationService.createReservation(email, firstName, lastName, arrival, departure, companions);
+    }
+
+    @PutMapping(path = "/update")
+    public ResponseEntity<Reservation> updateReservation(@RequestBody Reservation reservation, int bookingId) {
+
+        Reservation updatedReservation = reservationService.updateReservation(reservation, bookingId);
+        return ResponseEntity.ok(updatedReservation);
+    }
+
+    @DeleteMapping(path = "/delete")
+    public ResponseEntity<Object> deleteReservation(int id) {
+        reservationService.delete(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

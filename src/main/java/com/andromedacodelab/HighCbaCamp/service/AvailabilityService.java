@@ -38,11 +38,6 @@ public class AvailabilityService {
             && end.isEqual(r.getDeparture()) || end.isBefore(r.getDeparture()));
         }
 
-        /*LocalDateTime finalStart = start;
-        LocalDateTime finalEnd = end;
-        reservations.stream().anyMatch(r -> (finalStart.isEqual(r.getArrival()) || finalStart.isAfter(r.getArrival())
-                && finalEnd.isEqual(r.getDeparture()) || finalEnd.isBefore(r.getDeparture())));*/
-
         return isDateRangeAvailable;
     }
 }
