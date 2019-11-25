@@ -16,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Query;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -39,21 +38,14 @@ public class Reservation {
     private LocalDateTime departure;
 
     @OneToOne(cascade = CascadeType.ALL)
-    /*@JoinColumn(name = "\"STATUS_ID\"")
-    private ReservationStatus status;*/
-    /*@JoinTable(
-            name = "\"RESERVATION_STATUSES\"",
-            joinColumns = @JoinColumn(name = "\"STATUS_ID\""),
-            inverseJoinColumns = @JoinColumn(name = "\"NAME\"")
-    )*/
-    /*@Query("select status.name from RESERVATION_STATUSES status where status.ID = :statusId")*/
-    private String status;
+    @JoinColumn(name = "\"STATUS_ID\"")
+    private ReservationStatus status;
 
     @ManyToMany
     @JoinTable(
             name = "\"GUESTS_BY_RESERVATION\"",
             joinColumns = @JoinColumn(name = "\"BOOKING_ID\""),
-            inverseJoinColumns = @JoinColumn(name = "\"ID\"")
+            inverseJoinColumns = @JoinColumn(name = "\"GUEST_ID\"")
     )
     private Set<Guest> guests;
 
@@ -89,11 +81,11 @@ public class Reservation {
         this.guests = guests;
     }
 
-    public String getStatus() {
+    public ReservationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ReservationStatus status) {
         this.status = status;
     }
 }
