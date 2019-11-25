@@ -1,16 +1,11 @@
 package com.andromedacodelab.HighCbaCamp.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import org.springframework.data.web.JsonPath;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,7 +45,7 @@ public class Reservation {
             joinColumns = @JoinColumn(name = "\"BOOKING_ID\""),
             inverseJoinColumns = @JoinColumn(name = "\"GUEST_ID\"")
     )
-    private Set<Guest> guests;
+    private Set<Guest> companions;
 
     public int getBookingId() {
         return bookingId;
@@ -76,12 +71,12 @@ public class Reservation {
         this.departure = departure;
     }
 
-    public Set<Guest> getGuests() {
-        return guests;
+    public Set<Guest> getCompanions() {
+        return companions;
     }
 
-    public void setGuests(Set<Guest> guests) {
-        this.guests = guests;
+    public void setCompanions(Set<Guest> companions) {
+        this.companions = companions;
     }
 
     public ReservationStatus getStatus() {

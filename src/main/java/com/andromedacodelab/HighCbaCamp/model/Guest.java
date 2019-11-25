@@ -25,6 +25,9 @@ public class Guest {
     @Column(name = "\"EMAIL\"")
     private String email;
 
+    @Column(name = "\"IS_HOLDER\"")
+    private boolean isReservationHolder = false;
+
     public int getId() {
         return id;
     }
@@ -55,5 +58,13 @@ public class Guest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isReservationHolder() {
+        return isReservationHolder;
+    }
+
+    public void setReservationHolder(boolean reservationHolder) {
+        isReservationHolder = reservationHolder;
     }
 }

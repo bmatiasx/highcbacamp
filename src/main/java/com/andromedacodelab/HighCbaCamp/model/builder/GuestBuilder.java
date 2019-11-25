@@ -32,4 +32,9 @@ public class GuestBuilder {
         guest.setEmail(email);
         return this;
     }
+
+    public GuestBuilder withIsReservationHolder(boolean isHolder) {
+        guest.setReservationHolder(isHolder);
+        return this;
+    }
 }
