@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Component
@@ -30,6 +31,9 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
 
         if (errorAttributes.get("status").equals(NOT_FOUND.value())) {
             errorAttributes.put("message", "Resource does not exists");
+        } else if (errorAttributes.get("status").equals(INTERNAL_SERVER_ERROR.value())){
+            errorAttributes.put("message", "Oops, there was a problem on our end");
+            errorAttributes.remove("trace");
         }
         errorAttributes.remove("path");
 

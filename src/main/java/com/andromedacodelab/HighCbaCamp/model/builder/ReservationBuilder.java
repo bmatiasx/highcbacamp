@@ -33,12 +33,12 @@ public class ReservationBuilder {
     }
 
     public ReservationBuilder withCompanions(Set<Guest> companions) {
-        reservation.setCompanions(companions);
+        reservation.setGuests(companions);
         return this;
     }
 
     public ReservationBuilder withBookingId(Set<Guest> guests) {
-        reservation.setCompanions(guests);
+        reservation.setGuests(guests);
         return this;
     }
 }

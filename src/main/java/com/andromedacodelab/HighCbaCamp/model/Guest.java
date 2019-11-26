@@ -1,5 +1,8 @@
 package com.andromedacodelab.HighCbaCamp.model;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.lang.Nullable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,7 +16,7 @@ public class Guest {
 
     @Id
     @Column(name = "\"ID\"")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @Column(name = "\"FIRST_NAME\"")
@@ -25,8 +28,8 @@ public class Guest {
     @Column(name = "\"EMAIL\"")
     private String email;
 
-    @Column(name = "\"IS_HOLDER\"")
-    private boolean isReservationHolder = false;
+    @Column(name = "\"IS_RESERVATION_HOLDER\"")
+    private Boolean isReservationHolder;
 
     public int getId() {
         return id;
@@ -60,11 +63,14 @@ public class Guest {
         this.email = email;
     }
 
-    public boolean isReservationHolder() {
+    public Boolean isReservationHolder() {
+        if (isReservationHolder == null) {
+            isReservationHolder = false;
+        }
         return isReservationHolder;
     }
 
-    public void setReservationHolder(boolean reservationHolder) {
+    public void setReservationHolder(Boolean reservationHolder) {
         isReservationHolder = reservationHolder;
     }
 }

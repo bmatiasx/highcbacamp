@@ -23,7 +23,7 @@ public class Reservation {
 
     @Id
     @Column(name = "\"BOOKING_ID\"")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int bookingId;
 
     @Column(name = "\"ARRIVAL\"")
@@ -45,7 +45,7 @@ public class Reservation {
             joinColumns = @JoinColumn(name = "\"BOOKING_ID\""),
             inverseJoinColumns = @JoinColumn(name = "\"GUEST_ID\"")
     )
-    private Set<Guest> companions;
+    private Set<Guest> guests;
 
     public int getBookingId() {
         return bookingId;
@@ -71,12 +71,12 @@ public class Reservation {
         this.departure = departure;
     }
 
-    public Set<Guest> getCompanions() {
-        return companions;
+    public Set<Guest> getGuests() {
+        return guests;
     }
 
-    public void setCompanions(Set<Guest> companions) {
-        this.companions = companions;
+    public void setGuests(Set<Guest> guests) {
+        this.guests = guests;
     }
 
     public ReservationStatus getStatus() {
