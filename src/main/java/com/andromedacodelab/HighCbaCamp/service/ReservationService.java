@@ -1,13 +1,11 @@
 package com.andromedacodelab.HighCbaCamp.service;
 
-import com.andromedacodelab.HighCbaCamp.exception.ApiException;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -17,10 +15,12 @@ import java.util.Set;
 @Service
 public class ReservationService {
     private ReservationRepository reservationRepository;
+    private GuestService guestService;
 
     @Autowired
-    public ReservationService(ReservationRepository reservationRepository) {
+    public ReservationService(ReservationRepository reservationRepository, GuestService guestService) {
         this.reservationRepository = reservationRepository;
+        this.guestService = guestService;
     }
 
     /**
@@ -53,6 +53,9 @@ public class ReservationService {
         guests.add(reservationHolderGuest);
 
         // TODO check if the guests already exist in the DB, if not create them with GuestService
+        if (!doGuestExistInRecords(guests)) {
+            // add new guests to GUESTS table
+        }
 
         // TODO check if the provided date range is available to create a reservation
         // TODO validate if the reservation is made one day ahead of selected start date
@@ -76,6 +79,14 @@ public class ReservationService {
 
     public void delete(int id) {
         reservationRepository.deleteById(id);
+    }
+
+    public void doGuestExistInRecords(Set<Guest> guests) {
+        for (Guest guest : guests) {
+            guestService.findGuest(guest);
+            // check if guest has same first name, last name, email
+
+        }
     }
 
     private void updateGuests(Set<Guest> newGuests, Set<Guest> oldGuests) {
