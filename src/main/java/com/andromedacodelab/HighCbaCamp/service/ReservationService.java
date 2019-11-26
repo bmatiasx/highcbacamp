@@ -23,6 +23,11 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
+    /**
+     * This method is intended for search a Reservation by its id
+     * @param bookingId the reservation unique id.
+     * @return Reservation object with all details
+     */
     public Reservation findReservationByBookingId(int bookingId)  {
         return reservationRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -30,18 +35,30 @@ public class ReservationService {
                 ));
     }
 
+    /**
+     * This method is intended for create a Reservation
+     * @param email Represents the e-mail of the user who is the reservation holder
+     * @param firstName is the first name of the reservation holder
+     * @param lastName is the last name of the reservation holder
+     * @param arrival represents the starting day of the reservation
+     * @param departure represents the ending day of the reservation
+     * @param guests the guest companions who are not reservation holders
+     * @return Reservation object with all details
+     */
     public Reservation createReservation(String email, String firstName, String lastName,
                                          LocalDateTime arrival, LocalDateTime departure,
-                                         Set<Guest> companions) {
-        Guest guest = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
+                                         Set<Guest> guests) {
+        Guest reservationHolderGuest = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
                 .withEmail(email).withIsReservationHolder(true).build();
-        companions.add(guest);
+        guests.add(reservationHolderGuest);
+
         // TODO check if the guests already exist in the DB, if not create them with GuestService
+
         // TODO check if the provided date range is available to create a reservation
         // TODO validate if the reservation is made one day ahead of selected start date
         // TODO validate if the reservation does not lasts more than one month
         Reservation reservation = new ReservationBuilder().withArrivalDate(arrival)
-                .withDepartureDate(departure).withCompanions(companions).build();
+                .withDepartureDate(departure).withCompanions(guests).build();
         try {
             reservationRepository.save(reservation);
         } catch (Exception ex) {
@@ -51,8 +68,8 @@ public class ReservationService {
     }
 
     public Reservation updateReservation(Reservation reservation, int bookingId) {
-
-        // TODO validate if the guests are all the same. If not remove/add the existing.
+        // TODO validate if the guests are all the same. If not remove/add the existing using
+        // the updateGuests() method
 
         return new Reservation();
     }

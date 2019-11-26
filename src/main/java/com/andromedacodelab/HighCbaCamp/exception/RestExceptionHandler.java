@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String BAD_REQUEST_MESSAGE = "Request parameters are not be valid";
+    private static final String DATES_ARE_INVALID_MESSAGE = "The dates selected are not valid";
 
     @ExceptionHandler(EntityNotFoundException .class)
     protected ResponseEntity<Object> handleApiRequestException(EntityNotFoundException ex) {
@@ -27,10 +28,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<Object> constraintValidationException(MethodArgumentTypeMismatchException ex) {
+    public ResponseEntity<Object> constraintValidationException(MethodArgumentTypeMismatchException ex) {
         ApiException apiException = new ApiException(
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
                 HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), BAD_REQUEST_MESSAGE);
+        return new ResponseEntity<>(apiException, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidDateRangeException.class)
+    public ResponseEntity<Object> invalidDateRangeException(InvalidDateRangeException ex) {
+        ApiException apiException = new ApiException(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), DATES_ARE_INVALID_MESSAGE);
         return new ResponseEntity<>(apiException, HttpStatus.BAD_REQUEST);
     }
 }
