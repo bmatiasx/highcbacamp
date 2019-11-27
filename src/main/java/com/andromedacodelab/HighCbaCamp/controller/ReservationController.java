@@ -1,28 +1,18 @@
 package com.andromedacodelab.HighCbaCamp.controller;
 
-import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
 import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
+import com.andromedacodelab.HighCbaCamp.util.GuestWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reservation")
@@ -46,6 +36,7 @@ public class ReservationController {
     }
 
     @PostMapping(path = "/create")
+    @ResponseBody
     public ResponseEntity<String> createReservation(@Param(value = "email") String email,
                                                     @Param(value = "firstName") String firstName,
                                                     @Param(value = "lastName") String lastName,
@@ -55,12 +46,13 @@ public class ReservationController {
                                                     @Param(value = "departure")
                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                                 pattern = "yyyy-MM-dd") Date departure,
-                                                    @Param(value = "guests") Set<Guest> companions) {
+                                                    @RequestBody GuestWrapper companions) {
         LocalDateTime start = CampApiUtility.convertToLocalDateTime(arrival);
         LocalDateTime end = CampApiUtility.convertToLocalDateTime(departure);
 
-        Reservation reservation = reservationService.createReservation(email, firstName, lastName, start, end, companions);
-        return ResponseEntity.ok("Reservation created succesfully with bookingId: " + reservation.getBookingId());
+        Reservation reservation = reservationService.createReservation(email, firstName, lastName, start, end,
+                companions.getGuests());
+        return ResponseEntity.ok("Reservation created successfully with bookingId: " + reservation.getBookingId());
     }
 
     @PutMapping(path = "/update")
@@ -76,4 +68,9 @@ public class ReservationController {
 
         return ResponseEntity.noContent().build();
     }
+
+    /*@PutMapping(path = "/update-status")
+    public ResponseEntity<Object> updateReservationStatus() {
+        return ResponseEntity.ok();
+    }*/
 }

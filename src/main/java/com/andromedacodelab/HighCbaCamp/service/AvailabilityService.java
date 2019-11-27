@@ -21,7 +21,7 @@ public class AvailabilityService {
         this.reservationRepository = reservationRepository;
     }
 
-    public boolean isReservationAvailable(LocalDateTime start, LocalDateTime end) {
+    public boolean isReservationDateRangeAvailable(LocalDateTime start, LocalDateTime end) {
         // TODO handle multiple queries with pessimistic locking of date ranges
         /* Checks if the initial date is before the end date */
         if (!CampApiUtility.validateDates(start, end)) {

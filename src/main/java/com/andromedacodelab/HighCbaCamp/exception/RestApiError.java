@@ -1,12 +1,12 @@
 package com.andromedacodelab.HighCbaCamp.exception;
 
-public class ApiException {
+public class RestApiError {
     private String timestamp;
     private int status;
     private String error;
     private String message;
 
-    public ApiException(String timestamp, int status, String error, String message) {
+    public RestApiError(String timestamp, int status, String error, String message) {
         this.timestamp = timestamp;
         this.status = status;
         this.error = error;
