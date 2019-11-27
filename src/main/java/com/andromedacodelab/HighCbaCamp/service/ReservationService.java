@@ -71,8 +71,10 @@ public class ReservationService {
     }
 
     public Reservation updateReservation(Reservation reservation, int bookingId) {
-        // TODO validate if the guests are all the same. If not remove/add the existing using
+        // Validates if the guests are all the same than the persisted reservation. If not remove/add the existing using
         // the updateGuests() method
+
+        // Validates if the date range is the same than the persisted reservation
 
         return new Reservation();
     }
@@ -81,12 +83,15 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public void doGuestExistInRecords(Set<Guest> guests) {
+    public boolean doGuestExistInRecords(Set<Guest> guests) {
         for (Guest guest : guests) {
-            guestService.findGuest(guest);
             // check if guest has same first name, last name, email
-
+            if (!guestService.guestExists(guest)) {
+                guestService.create(guest);
+            }
         }
+
+        return true;
     }
 
     private void updateGuests(Set<Guest> newGuests, Set<Guest> oldGuests) {

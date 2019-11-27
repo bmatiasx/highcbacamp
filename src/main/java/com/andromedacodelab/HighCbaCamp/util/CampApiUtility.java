@@ -17,16 +17,24 @@ public class CampApiUtility {
                 .toLocalDateTime();
     }
 
-    public static boolean doesReservationDatesOverlap(@NotNull LocalDateTime start, @NotNull LocalDateTime end, Reservation reservation) {
+    public static boolean doesReservationDatesOverlap(@NotNull LocalDateTime start, @NotNull LocalDateTime end,
+                                                      Reservation reservation) {
         // case 1
         return (start.isEqual(reservation.getArrival()) && addWholeDay(end).isEqual(reservation.getDeparture())) ||
                 // case 2
-                (start.isEqual(reservation.getArrival()) && addWholeDay(end).isBefore(reservation.getDeparture())) ||
+                (start.isEqual(reservation.getArrival()) && isBetweenDates(start, end, reservation.getDeparture())) ||
                 // case 3
-                (start.isBefore(reservation.getArrival()) && addWholeDay(end).isEqual(reservation.getDeparture())) ||
+                (isBetweenDates(start, end, reservation.getArrival())) &&
+                        addWholeDay(end).isEqual(reservation.getDeparture()) ||
                 // case 4
                 (start.isBefore(reservation.getArrival()) && addWholeDay(end).isAfter(reservation.getDeparture())) ||
                 // case 5
+                (isBetweenDates(start, end, reservation.getArrival()) &&
+                        isBetweenDates(reservation.getArrival(), reservation.getDeparture(), addWholeDay(end))) ||
+                // case 6
+                (isBetweenDates(start, reservation.getArrival(), reservation.getDeparture()) &&
+                        isBetweenDates(reservation.getArrival(), start, end)) ||
+                // case 7
                 (start.isAfter(reservation.getArrival()) && addWholeDay(end).isBefore(reservation.getDeparture()));
     }
 
@@ -39,6 +47,10 @@ public class CampApiUtility {
 
     public static boolean validateDates(@NotNull LocalDateTime start, @NotNull LocalDateTime end) {
         return start.isBefore(end);
+    }
+
+    public static boolean isBetweenDates(LocalDateTime start, LocalDateTime end, LocalDateTime target) {
+        return !(target.isBefore(start) || target.isAfter(end));
     }
 
     public static LocalDateTime addWholeDay(LocalDateTime endDay) {

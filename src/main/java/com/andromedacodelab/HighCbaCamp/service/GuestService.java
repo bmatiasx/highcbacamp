@@ -14,7 +14,11 @@ public class GuestService {
         this.guestRepository = guestRepository;
     }
 
-    public Guest findGuest(Guest guest) {
-        return guestRepository.findOne(guest);
+    public void create(Guest guest) {
+        guestRepository.save(guest);
+    }
+
+    public boolean guestExists(Guest guest) {
+        return guestRepository.existsGuestByFirstNameAndLastNameAndEmail(guest.getFirstName(), guest.getLastName(), guest.getEmail());
     }
 }

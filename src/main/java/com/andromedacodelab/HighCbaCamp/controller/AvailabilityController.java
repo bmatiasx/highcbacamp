@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -25,38 +26,39 @@ public class AvailabilityController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<?> checkAvailabilityForDates(@RequestParam("start")
+    public ResponseEntity<?> checkAvailabilityForDates(@RequestParam(value = "start", required = false)
                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                             pattern = "yyyy-MM-dd")
                                                             Date startDate,
-                                                         @RequestParam("end")
+                                                         @RequestParam(value = "end", required = false)
                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                             pattern = "yyyy-MM-dd")
                                                             Date endDate) {
 
-        LocalDateTime start = CampApiUtility.convertToLocalDateTime(startDate);
-        LocalDateTime end = CampApiUtility.convertToLocalDateTime(endDate);
+        LocalDateTime start;
+        LocalDateTime end;
+        if (startDate == null || endDate == null) {
+            /* Use the default date range which is 1 month*/
+            start = LocalDateTime.now();
+            end = start.plusMonths(1);
+        } else {
+            start = CampApiUtility.convertToLocalDateTime(startDate);
+            end = CampApiUtility.convertToLocalDateTime(endDate);
+        }
+
         boolean isDateRangeAvailable = availabilityService.isReservationAvailable(start, end);
 
-        // https://stackoverflow.com/questions/40765010/how-to-return-json-with-multiple-properties-by-using-responseentity-in-spring-re
-
         if (isDateRangeAvailable) {
-            /*return ResponseEntity.ok().body("The date range is available!");*/
-            /*return CampApiUtility.availabilityResponseMessage("The date range is available!");*/
-            return new ResponseEntity<Map<String, String>>(
-                    CampApiUtility.availabilityResponseMessage("The date range is available!"), HttpStatus.OK);
-        } else {
-            /*return ResponseEntity.ok("The date range [startDate: " +
-                    start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
-                    ", endDate: " + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "] is not available");*/
-
-            /*return CampApiUtility.availabilityResponseMessage("The date range [startDate: " +
-                    start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
-                    ", endDate: " + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "] is not available");*/
-            return new ResponseEntity<Map<String, String>>(
-                    CampApiUtility.availabilityResponseMessage("The date range [startDate: " +
+            return new ResponseEntity<>(
+                    CampApiUtility.availabilityResponseMessage("The date range [arrival: " +
                             start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
-                            ", endDate: " + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "] is not available"), HttpStatus.CONFLICT);
+                            ", departure: " + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "] is available!"),
+                    HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(CampApiUtility.availabilityResponseMessage("The date range [arrival: " +
+                    start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
+                    ", departure: " + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "] is not available")
+                    , HttpStatus.CONFLICT);
         }
     }
 }
