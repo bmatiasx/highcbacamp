@@ -3,7 +3,10 @@ package com.andromedacodelab.HighCbaCamp.controller;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
+import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,10 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 @RestController
@@ -41,10 +46,20 @@ public class ReservationController {
     }
 
     @PostMapping(path = "/create")
-    public ResponseEntity<String> createReservation(String email, String firstName, String lastName,
-                                         LocalDateTime arrival, LocalDateTime departure,
-                                         Set<Guest> companions) {
-        Reservation reservation = reservationService.createReservation(email, firstName, lastName, arrival, departure, companions);
+    public ResponseEntity<String> createReservation(@Param(value = "email") String email,
+                                                    @Param(value = "firstName") String firstName,
+                                                    @Param(value = "lastName") String lastName,
+                                                    @Param(value = "arrival")
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
+                                                                pattern = "yyyy-MM-dd") Date arrival,
+                                                    @Param(value = "departure")
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
+                                                                pattern = "yyyy-MM-dd") Date departure,
+                                                    @Param(value = "guests") Set<Guest> companions) {
+        LocalDateTime start = CampApiUtility.convertToLocalDateTime(arrival);
+        LocalDateTime end = CampApiUtility.convertToLocalDateTime(departure);
+
+        Reservation reservation = reservationService.createReservation(email, firstName, lastName, start, end, companions);
         return ResponseEntity.ok("Reservation created succesfully with bookingId: " + reservation.getBookingId());
     }
 

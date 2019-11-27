@@ -46,9 +46,7 @@ public class AvailabilityController {
             end = CampApiUtility.convertToLocalDateTime(endDate);
         }
 
-        boolean isDateRangeAvailable = availabilityService.isReservationAvailable(start, end);
-
-        if (isDateRangeAvailable) {
+        if (availabilityService.isReservationAvailable(start, end)) {
             return new ResponseEntity<>(
                     CampApiUtility.availabilityResponseMessage("The date range [arrival: " +
                             start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
