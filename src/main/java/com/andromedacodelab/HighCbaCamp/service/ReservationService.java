@@ -11,7 +11,6 @@ import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationStatusesRepository;
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

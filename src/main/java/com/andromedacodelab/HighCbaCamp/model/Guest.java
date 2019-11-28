@@ -1,8 +1,5 @@
 package com.andromedacodelab.HighCbaCamp.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import org.springframework.lang.Nullable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
