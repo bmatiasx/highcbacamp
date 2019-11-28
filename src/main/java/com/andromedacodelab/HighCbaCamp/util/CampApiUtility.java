@@ -35,7 +35,9 @@ public class CampApiUtility {
                 (isBetweenDates(start, reservation.getArrival(), reservation.getDeparture()) &&
                         isBetweenDates(reservation.getArrival(), start, end)) ||
                 // case 7
-                (start.isAfter(reservation.getArrival()) && addWholeDay(end).isBefore(reservation.getDeparture()));
+                (start.isAfter(reservation.getArrival()) && addWholeDay(end).isBefore(reservation.getDeparture()) ||
+                // If nothing above worked check for the cancelled status to return availability
+                reservation.getStatus().getName().equals("CANCELLED"));
     }
 
     public static Map<String, String> availabilityResponseMessage(String value) {

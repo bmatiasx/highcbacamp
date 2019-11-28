@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 @Service
 public class ReservationService {
@@ -38,21 +38,23 @@ public class ReservationService {
 
     /**
      * This method is intended for search a Reservation by its id
+     *
      * @param bookingId the reservation unique id.
      * @return Reservation object with all details
      */
-    public Reservation findReservationByBookingId(int bookingId)  {
+    public Reservation findReservationByBookingId(int bookingId) {
         return getReservation(bookingId);
     }
 
     /**
      * This method is intended for create a Reservation
-     * @param email Represents the e-mail of the user who is the reservation holder
+     *
+     * @param email     Represents the e-mail of the user who is the reservation holder
      * @param firstName is the first name of the reservation holder
-     * @param lastName is the last name of the reservation holder
-     * @param arrival represents the starting day of the reservation
+     * @param lastName  is the last name of the reservation holder
+     * @param arrival   represents the starting day of the reservation
      * @param departure represents the ending day of the reservation
-     * @param guests the guest companions who are not reservation holders
+     * @param guests    the guest companions who are not reservation holders
      * @return Reservation object with all details
      */
     public Reservation createReservation(String email, String firstName, String lastName,
@@ -72,7 +74,8 @@ public class ReservationService {
         /* Check if the guests already exist in the DB, if not create them with GuestService*/
         doGuestExistInRecords(guests);
 
-        ReservationStatus status = reservationStatusesRepository.getOne(1);
+        /* Reservation status id 2 = CONFIRMED*/
+        ReservationStatus status = reservationStatusesRepository.getOne(2);
 
         Reservation reservation = new ReservationBuilder().withArrivalDate(arrival)
                 .withDepartureDate(departure).withStatus(status).withCompanions(guests).build();
@@ -82,6 +85,62 @@ public class ReservationService {
             throw new RuntimeException("Reservation could not be created");
         }
         return reservation;
+    }
+
+    /**
+     * Update an existing reservation validating if the dates or the guests are the same.
+     * If not replace/remove for the new ones or update the existing if needed
+     *
+     * @param reservation
+     * @param bookingId
+     * @return the reservation that was updated with its new state
+     */
+    public Reservation updateReservation(Reservation reservation, int bookingId) {
+        /* Creates the guests that don't exist in the DB*/
+        doGuestExistInRecords(reservation.getGuests());
+        Reservation oldReservation = getReservation(bookingId);
+
+        /* Removes guests that don't belong to the reservation anymore*/
+        removeGuestsIfAny(reservation, oldReservation);
+
+        if (IntStream.range(1, 4).noneMatch(s -> s == reservation.getStatus().getId())) {
+            throw new InvalidReservationStatusException();
+        } else if (!reservation.getStatus().equals(oldReservation.getStatus())) {
+            oldReservation.setStatus(reservation.getStatus());
+        }
+
+        /* Validates if the date range is the same than the persisted reservation*/
+        if (!validateReservationDatesAreEqual(reservation.getArrival(), oldReservation.getArrival())) {
+            /* Update the old reservation ARRIVAL date*/
+            if (!availabilityService.isReservationDateRangeAvailable(
+                    reservation.getArrival(), oldReservation.getDeparture())) throw new InvalidDateRangeException();
+
+            /* Then lock the dates for the new date range and unlock the old so the change can be persisted*/
+            oldReservation.setArrival(reservation.getArrival());
+        }
+        if (validateReservationDatesAreEqual(reservation.getDeparture(), oldReservation.getDeparture())) {
+            /* Update the old reservation DEPARTURE date*/
+            if (!availabilityService.isReservationDateRangeAvailable(
+                    oldReservation.getArrival(), reservation.getDeparture())) throw new InvalidDateRangeException();
+
+            oldReservation.setDeparture(reservation.getDeparture());
+        }
+
+        return reservationRepository.save(oldReservation);
+    }
+
+    /**
+     *
+     * @param reservation
+     * @param oldReservation
+     */
+    private void removeGuestsIfAny(Reservation reservation, Reservation oldReservation) {
+        // traverse the old reservation guests and if any of them don't exists in the new remove the element(s)
+        for (Guest oldGuest : oldReservation.getGuests()) {
+            if (!reservation.getGuests().contains(oldGuest)) {
+                oldReservation.getGuests().remove(oldGuest);
+            }
+        }
     }
 
     /**
@@ -96,60 +155,14 @@ public class ReservationService {
         LocalDate now = LocalDate.now();
 
         if ((arrival.toLocalDate().isEqual(now.minusDays(1)) || arrival.toLocalDate().isBefore(now.minusDays(1)))
-        && (arrival.toLocalDate().isEqual(now.minusMonths(1)) || arrival.toLocalDate().isBefore(now.minusMonths(1)))) {
+                && (arrival.toLocalDate().isEqual(now.minusMonths(1)) || arrival.toLocalDate().isBefore(now.minusMonths(1)))) {
             throw new ReservationOutOfTermException();
         }
     }
 
     /**
-     * Update an existing reservation validating if the dates or the guests are the same.
-     * If not replace/remove for the new ones or update the existing if needed
-     * @param reservation
-     * @param bookingId
-     * @return
-     */
-    public Reservation updateReservation(Reservation reservation, int bookingId) {
-        // TODO Validates if the guests are all the same than the persisted reservation.
-        //  If not remove/add the existing using the doGuestExistInRecords() method. Also check if a guest is removed
-
-        doGuestExistInRecords(reservation.getGuests());
-        Reservation oldReservation = getReservation(bookingId);
-
-        // TODO update the status of the reservation
-        if (isValidReservationStatus(reservation.getStatus().getName())) {
-            throw new InvalidReservationStatusException();
-        } else if(!reservation.getStatus().equals(oldReservation.getStatus())) {
-            oldReservation.setStatus(reservation.getStatus());
-        }
-
-        /* Validates if the date range is the same than the persisted reservation*/
-        if (!validateReservationDatesAreEqual(reservation.getArrival(), oldReservation.getArrival())){
-            /* Update the old reservation ARRIVAL date*/
-            if (!availabilityService.isReservationDateRangeAvailable(reservation.getArrival(), oldReservation.getDeparture())) {
-                throw new InvalidDateRangeException();
-            }
-            /* Then lock the dates for the new date range and unlock the old so the change can be persisted*/
-            oldReservation.setArrival(reservation.getArrival());
-        }
-        if (validateReservationDatesAreEqual(reservation.getDeparture(), oldReservation.getDeparture())) {
-            /* Update the old reservation DEPARTURE date*/
-            if (!availabilityService.isReservationDateRangeAvailable(oldReservation.getArrival(), reservation.getDeparture())) {
-                throw new InvalidDateRangeException();
-            }
-            oldReservation.setDeparture(reservation.getDeparture());
-        }
-
-        return reservationRepository.save(oldReservation);
-    }
-
-    private boolean isValidReservationStatus(String status) {
-        List<ReservationStatus> statuses = reservationStatusesRepository.findAll();
-
-        return !statuses.stream().allMatch(s -> s.getName().equals(status));
-    }
-
-    /**
      * Checks two reservation dates are the same ignoring hours of day.
+     *
      * @param newReservationDate
      * @param oldReservationDate
      * @return true if the dates are equal
@@ -158,28 +171,26 @@ public class ReservationService {
         return newReservationDate.toLocalDate().isEqual(oldReservationDate.toLocalDate());
     }
 
+    /**
+     *
+     * @param id
+     */
     public void delete(int id) {
         reservationRepository.deleteById(id);
     }
 
     /**
-     *
      * @param guests
      */
     public void doGuestExistInRecords(Set<Guest> guests) {
-
-        guests.stream().filter( g -> (!guestService.guestExists(g))).forEach(guest -> guestService.create(guest));
+        guests.stream().filter(g -> (!guestService.guestExists(g))).forEach(guest -> guestService.create(guest));
     }
 
     /**
      *
-     * @param newGuests
-     * @param oldGuests
+     * @param bookingId
+     * @return
      */
-    private void updateGuests(Set<Guest> newGuests, Set<Guest> oldGuests) {
-
-    }
-
     private Reservation getReservation(int bookingId) {
         return reservationRepository.findById(bookingId)
                 .orElseThrow(() -> new ReservationNotFoundException(bookingId));
@@ -190,12 +201,8 @@ public class ReservationService {
 
         ReservationStatus newReservationStatus = reservationStatusesRepository.getOne(newStatusId);
 
-        /*if (isValidReservationStatus(newStatus)) {
-            throw new InvalidReservationStatusException();
-        }
+        if (IntStream.range(1, 4).noneMatch(s -> s == newStatusId)) throw new InvalidReservationStatusException();
 
-        ReservationStatus newReservationStatus = new ReservationStatus();
-        newReservationStatus.setName(newStatus);*/
         oldReservation.setStatus(newReservationStatus);
 
         return reservationRepository.save(oldReservation);
