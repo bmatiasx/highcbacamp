@@ -20,6 +20,7 @@ import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATES_ARE_I
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_AVAILABLE_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.INVALID_RESERVATION_STATUS_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.RESERVATION_NOT_SAVED_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -27,7 +28,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(EntityNotFoundException .class)
     protected ResponseEntity<Object> handleApiRequestException(EntityNotFoundException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage());
         return new ResponseEntity<>(restApiError, HttpStatus.NOT_FOUND);
     }
@@ -35,7 +36,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ReservationNotFoundException .class)
     protected ResponseEntity<Object> handleApiRequestException(ReservationNotFoundException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage());
         return new ResponseEntity<>(restApiError, HttpStatus.NOT_FOUND);
     }
@@ -43,7 +44,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> constraintValidationException(MethodArgumentTypeMismatchException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), BAD_REQUEST_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
     }
@@ -51,7 +52,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InvalidDateRangeException.class)
     public ResponseEntity<Object> handleInvalidDateRangeException(InvalidDateRangeException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), DATES_ARE_INVALID_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
     }
@@ -61,7 +62,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                           HttpHeaders headers, HttpStatus status,
                                                                           WebRequest request) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), ex.getMessage());
         return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
     }
@@ -69,7 +70,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DateRangeNotAvailableException .class)
     protected ResponseEntity<Object> handleDateRangeNotAvailableException(DateRangeNotAvailableException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), DATE_RANGE_NOT_AVAILABLE_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
     }
@@ -78,7 +79,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ReservationOutOfTermException .class)
     protected ResponseEntity<Object> handleReservationOutOfTermException(ReservationOutOfTermException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), CONSTRAINTS_NOT_MET_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
     }
@@ -86,7 +87,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NotSavedReservationException .class)
     protected ResponseEntity<Object> handleNotSavedReservationException(NotSavedReservationException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), RESERVATION_NOT_SAVED_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
     }
@@ -94,7 +95,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InvalidReservationStatusException .class)
     protected ResponseEntity<Object> handleNotSavedReservationException(InvalidReservationStatusException ex) {
         RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), INVALID_RESERVATION_STATUS_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
     }

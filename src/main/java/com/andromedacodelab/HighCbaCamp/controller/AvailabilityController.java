@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
+
 @RestController
 @RequestMapping("/api/availability")
 public class AvailabilityController {
@@ -30,11 +32,11 @@ public class AvailabilityController {
     @ResponseBody
     public ResponseEntity<?> checkAvailabilityForDates(@RequestParam(value = "start", required = false)
                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
-                                                            pattern = "yyyy-MM-dd")
+                                                            pattern = YEAR_MONTH_DAY)
                                                             Date startDate,
                                                          @RequestParam(value = "end", required = false)
                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
-                                                            pattern = "yyyy-MM-dd")
+                                                            pattern = YEAR_MONTH_DAY)
                                                             Date endDate) {
 
         LocalDateTime start;
@@ -51,13 +53,13 @@ public class AvailabilityController {
         if (availabilityService.isReservationDateRangeAvailable(start, end)) {
             return new ResponseEntity<>(
                     CampApiUtility.availabilityResponseMessage("The date range [arrival: " +
-                            start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
-                            ", departure: " + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "] is available!"),
+                            start.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) +
+                            ", departure: " + end.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) + "] is available!"),
                     HttpStatus.OK);
         } else {
             return new ResponseEntity<>(CampApiUtility.availabilityResponseMessage("The date range [arrival: " +
-                    start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
-                    ", departure: " + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "] is not available")
+                    start.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) +
+                    ", departure: " + end.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) + "] is not available")
                     , HttpStatus.CONFLICT);
         }
     }
