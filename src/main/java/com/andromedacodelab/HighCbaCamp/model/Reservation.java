@@ -24,7 +24,7 @@ public class Reservation {
 
     @Id
     @Column(name = "\"BOOKING_ID\"")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int bookingId;
 
     @Column(name = "\"ARRIVAL\"")

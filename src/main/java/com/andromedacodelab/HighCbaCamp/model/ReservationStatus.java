@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class ReservationStatus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "\"ID\"")
     @JsonIgnore
     private int id;
