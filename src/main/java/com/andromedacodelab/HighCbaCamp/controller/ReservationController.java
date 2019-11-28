@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,11 +76,30 @@ public class ReservationController {
         return ResponseEntity.ok("Reservation created successfully with bookingId: " + reservation.getBookingId());
     }
 
-    private Set<Guest> convertListToSet(List<?> guests) {
-        return guests.stream()
-                .filter(Guest.class::isInstance)
-                .map(Guest.class::cast)
-                .collect(Collectors.toSet());
+    private Set<Guest> convertListToSet(List<Map<String, String>> guests) {
+        Set<Guest> guestSet = new HashSet<>();
+
+        for (Map<String, String> map : guests) {
+            Guest guest = new Guest();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                switch (entry.getKey()) {
+                    case "firstName":
+                        guest.setFirstName(entry.getValue());
+                        break;
+                    case "lastName":
+                        guest.setLastName(entry.getValue());
+                        break;
+                    case "email":
+                        guest.setEmail(entry.getValue());
+                        break;
+                }
+                /*if (entry.getKey().equals("reservationHolder")) {
+                    guest.setReservationHolder(Boolean.parseBoolean(entry.getValue()));
+                }*/
+            }
+            guestSet.add(guest);
+        }
+        return guestSet;
     }
 
     @PutMapping(path = "/update")
