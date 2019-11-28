@@ -108,8 +108,13 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
-    /*@PutMapping(path = "/update-status")
-    public ResponseEntity<Object> updateReservationStatus() {
-        return ResponseEntity.ok();
-    }*/
+    @PutMapping(path = "/update/status")
+    @ResponseBody
+    public ResponseEntity<Object> updateReservationStatus(@RequestBody JSONObject request) {
+        int bookingId = Integer.parseInt(request.get("bookingId").toString());
+        int newStatusId = Integer.parseInt(request.get("statusId").toString());
+
+        return ResponseEntity.ok("Reservation with bookingId " + bookingId + " status was updated to: " +
+                reservationService.updateReservationStatus(bookingId, newStatusId).getStatus().getName());
+    }
 }

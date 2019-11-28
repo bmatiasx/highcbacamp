@@ -23,6 +23,7 @@ public class AvailabilityService {
 
     public boolean isReservationDateRangeAvailable(LocalDateTime start, LocalDateTime end) {
         // TODO handle multiple queries with pessimistic locking of date ranges
+        // see: https://stackoverflow.com/questions/46893237/can-spring-boot-application-handle-multiple-requests-simultaneously
         /* Checks if the initial date is before the end date */
         if (!CampApiUtility.validateDates(start, end)) {
             throw new InvalidDateRangeException();

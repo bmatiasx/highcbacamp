@@ -43,9 +43,6 @@ public class ReservationService {
      */
     public Reservation findReservationByBookingId(int bookingId)  {
         return getReservation(bookingId);
-                /*.orElseThrow(() -> new EntityNotFoundException(
-                        "The reservation with bookingId " + bookingId + " is not found"
-                ));*/
     }
 
     /**
@@ -75,8 +72,10 @@ public class ReservationService {
         /* Check if the guests already exist in the DB, if not create them with GuestService*/
         doGuestExistInRecords(guests);
 
+        ReservationStatus status = reservationStatusesRepository.getOne(1);
+
         Reservation reservation = new ReservationBuilder().withArrivalDate(arrival)
-                .withDepartureDate(departure).withCompanions(guests).build();
+                .withDepartureDate(departure).withStatus(status).withCompanions(guests).build();
         try {
             reservationRepository.save(reservation);
         } catch (Exception ex) {
@@ -115,13 +114,9 @@ public class ReservationService {
 
         doGuestExistInRecords(reservation.getGuests());
         Reservation oldReservation = getReservation(bookingId);
-                /*.orElseThrow(() -> new EntityNotFoundException(
-                "The reservation with bookingId " + bookingId + " is not found"
-        ));
-        */
 
         // TODO update the status of the reservation
-        if (!isValidReservationStatus(reservation.getStatus().getName())) {
+        if (isValidReservationStatus(reservation.getStatus().getName())) {
             throw new InvalidReservationStatusException();
         } else if(!reservation.getStatus().equals(oldReservation.getStatus())) {
             oldReservation.setStatus(reservation.getStatus());
@@ -150,7 +145,7 @@ public class ReservationService {
     private boolean isValidReservationStatus(String status) {
         List<ReservationStatus> statuses = reservationStatusesRepository.findAll();
 
-        return statuses.stream().allMatch(s -> s.getName().equals(status));
+        return !statuses.stream().allMatch(s -> s.getName().equals(status));
     }
 
     /**
@@ -174,13 +169,6 @@ public class ReservationService {
     public void doGuestExistInRecords(Set<Guest> guests) {
 
         guests.stream().filter( g -> (!guestService.guestExists(g))).forEach(guest -> guestService.create(guest));
-
-        /*for (Guest guest : guests) {
-            // check if guest has same first name, last name, email
-            if (!guestService.guestExists(guest)) {
-                guestService.create(guest);
-            }
-        }*/
     }
 
     /**
@@ -197,14 +185,17 @@ public class ReservationService {
                 .orElseThrow(() -> new ReservationNotFoundException(bookingId));
     }
 
-    public Reservation updateReservationStatus(int bookingId, String newStatus) {
+    public Reservation updateReservationStatus(int bookingId, int newStatusId) {
         Reservation oldReservation = getReservation(bookingId);
 
-        if (!isValidReservationStatus(newStatus)) {
+        ReservationStatus newReservationStatus = reservationStatusesRepository.getOne(newStatusId);
+
+        /*if (isValidReservationStatus(newStatus)) {
             throw new InvalidReservationStatusException();
         }
+
         ReservationStatus newReservationStatus = new ReservationStatus();
-        newReservationStatus.setName(newStatus);
+        newReservationStatus.setName(newStatus);*/
         oldReservation.setStatus(newReservationStatus);
 
         return reservationRepository.save(oldReservation);

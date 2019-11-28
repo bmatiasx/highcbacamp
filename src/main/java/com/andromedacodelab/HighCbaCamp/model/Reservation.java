@@ -40,7 +40,7 @@ public class Reservation {
     @JsonRawValue
     private ReservationStatus status;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "\"GUESTS_BY_RESERVATION\"",
             joinColumns = @JoinColumn(name = "\"BOOKING_ID\""),

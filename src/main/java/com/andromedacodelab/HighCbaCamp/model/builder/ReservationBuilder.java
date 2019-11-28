@@ -2,6 +2,7 @@ package com.andromedacodelab.HighCbaCamp.model.builder;
 
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
+import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -37,8 +38,8 @@ public class ReservationBuilder {
         return this;
     }
 
-    public ReservationBuilder withBookingId(Set<Guest> guests) {
-        reservation.setGuests(guests);
+    public ReservationBuilder withStatus(ReservationStatus status) {
+        reservation.setStatus(status);
         return this;
     }
 }
