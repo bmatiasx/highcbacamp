@@ -18,16 +18,16 @@ public class ReservationStatus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "\"ID\"")
     @JsonIgnore
-    private int id;
+    private Integer id;
 
     @Column(name = "\"NAME\"")
     private String name;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

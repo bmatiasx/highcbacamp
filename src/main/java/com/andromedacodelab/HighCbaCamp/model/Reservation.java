@@ -18,6 +18,8 @@ import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS;
+
 @Entity
 @Table(name = "\"RESERVATIONS\"")
 public class Reservation {
@@ -25,17 +27,17 @@ public class Reservation {
     @Id
     @Column(name = "\"BOOKING_ID\"")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int bookingId;
+    private Integer bookingId;
 
     @Column(name = "\"ARRIVAL\"")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss a")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)
     private LocalDateTime arrival;
 
     @Column(name = "\"DEPARTURE\"")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss a")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)
     private LocalDateTime departure;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "\"STATUS_ID\"")
     @JsonRawValue
     private ReservationStatus status;
@@ -48,11 +50,11 @@ public class Reservation {
     )
     private Set<Guest> guests;
 
-    public int getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(int bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 

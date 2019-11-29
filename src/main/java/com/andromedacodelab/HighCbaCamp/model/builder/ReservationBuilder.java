@@ -18,7 +18,7 @@ public class ReservationBuilder {
         return reservation;
     }
 
-    public ReservationBuilder withBookingId(int bookingId) {
+    public ReservationBuilder withBookingId(Integer bookingId) {
         reservation.setBookingId(bookingId);
         return this;
     }
@@ -33,7 +33,7 @@ public class ReservationBuilder {
         return this;
     }
 
-    public ReservationBuilder withCompanions(Set<Guest> companions) {
+    public ReservationBuilder withGuests(Set<Guest> companions) {
         reservation.setGuests(companions);
         return this;
     }

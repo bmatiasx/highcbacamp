@@ -9,6 +9,8 @@ public class RestApiConstants {
     public static final String INVALID_RESERVATION_STATUS_MESSAGE = "Invalid reservation status found. Try again with a valid status";
     public static final String RESOURCE_NOT_EXISTS_MESSAGE = "Resource does not exists";
     public static final String SERVER_ERROR_MESSAGE = "Oops, there was a problem on our end";
+    public static final String BODY_IS_MISSING_MESSAGE = "Required request body is missing";
+    public static final String RESERVATION_CANCELLED_MESSAGE = "The reservation you're trying to modify is cancelled";
     public static final String YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS = "yyyy-MM-dd hh:mm:ss a";
     public static final String YEAR_MONTH_DAY = "yyyy-MM-dd";
 }

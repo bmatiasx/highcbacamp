@@ -13,7 +13,7 @@ public class GuestBuilder {
         return guest;
     }
 
-    public GuestBuilder withId(int id) {
+    public GuestBuilder withId(Integer id) {
         guest.setId(id);
         return this;
     }

@@ -1,7 +1,7 @@
 package com.andromedacodelab.HighCbaCamp.exception;
 
 public class ReservationNotFoundException extends RuntimeException {
-    private int bookingId;
+    private Integer bookingId;
 
     public ReservationNotFoundException() {
     }
@@ -10,7 +10,7 @@ public class ReservationNotFoundException extends RuntimeException {
         super(s);
     }
 
-    public ReservationNotFoundException(int bookingId) {
+    public ReservationNotFoundException(Integer bookingId) {
         this.bookingId = bookingId;
     }
 

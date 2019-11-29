@@ -3,6 +3,7 @@ package com.andromedacodelab.HighCbaCamp.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,17 +16,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BAD_REQUEST_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BODY_IS_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.CONSTRAINTS_NOT_MET_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATES_ARE_INVALID_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_AVAILABLE_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.INVALID_RESERVATION_STATUS_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.RESERVATION_CANCELLED_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.RESERVATION_NOT_SAVED_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException .class)
+    @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleApiRequestException(EntityNotFoundException ex) {
         RestApiError restApiError = new RestApiError(
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
@@ -33,7 +36,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(restApiError, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ReservationNotFoundException .class)
+    @ExceptionHandler(ReservationNotFoundException.class)
     protected ResponseEntity<Object> handleApiRequestException(ReservationNotFoundException ex) {
         RestApiError restApiError = new RestApiError(
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
@@ -67,6 +70,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+                                                                  HttpHeaders headers, HttpStatus status,
+                                                                  WebRequest request) {
+        RestApiError restApiError = new RestApiError(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), BODY_IS_MISSING_MESSAGE);
+        return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(DateRangeNotAvailableException .class)
     protected ResponseEntity<Object> handleDateRangeNotAvailableException(DateRangeNotAvailableException ex) {
         RestApiError restApiError = new RestApiError(
@@ -97,6 +110,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         RestApiError restApiError = new RestApiError(
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), INVALID_RESERVATION_STATUS_MESSAGE);
+        return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ReservationCancelledException .class)
+    protected ResponseEntity<Object> handleReservationCancelledException(ReservationCancelledException ex) {
+        RestApiError restApiError = new RestApiError(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
+                HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), RESERVATION_CANCELLED_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
     }
 }
