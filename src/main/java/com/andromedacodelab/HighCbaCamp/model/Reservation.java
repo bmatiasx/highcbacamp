@@ -37,12 +37,12 @@ public class Reservation {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)
     private LocalDateTime departure;
 
-    @OneToOne(cascade = CascadeType.DETACH)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "\"STATUS_ID\"")
     @JsonRawValue
     private ReservationStatus status;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             name = "\"GUESTS_BY_RESERVATION\"",
             joinColumns = @JoinColumn(name = "\"BOOKING_ID\""),

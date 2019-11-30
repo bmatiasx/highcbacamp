@@ -25,15 +25,15 @@ public class AvailabilityService {
         // TODO handle multiple queries with pessimistic locking of date ranges
         // see: https://stackoverflow.com/questions/46893237/can-spring-boot-application-handle-multiple-requests-simultaneously
         /* Checks if the initial date is before the end date */
-        if (!CampApiUtility.validateDates(start, end)) {
+        if (!CampApiUtility.validateArrivalIsBeforeDeparture(start, end)) {
             throw new InvalidDateRangeException();
         }
 
-        List<Reservation> reservations = reservationRepository.findAll();
+        List<Reservation> existingReservations = reservationRepository.findAll();
         boolean isDateRangeAvailable = false;
 
-        for (Reservation reservation : reservations) {
-            isDateRangeAvailable = !doesReservationDatesOverlap(start, end, reservation);
+        for (Reservation existingReservation : existingReservations) {
+            isDateRangeAvailable = !doesReservationDatesOverlap(start, end, existingReservation);
         }
         return isDateRangeAvailable;
     }

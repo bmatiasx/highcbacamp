@@ -22,26 +22,26 @@ public class CampApiUtility {
     }
 
     public static boolean doesReservationDatesOverlap(@NotNull LocalDateTime start, @NotNull LocalDateTime end,
-                                                      Reservation reservation) {
+                                                      Reservation existingReservation) {
         // case 1
-        return (start.isEqual(reservation.getArrival()) && addWholeDay(end).isEqual(reservation.getDeparture())) ||
+        return (start.isEqual(existingReservation.getArrival()) && addWholeDay(end).isEqual(existingReservation.getDeparture())) ||
                 // case 2
-                (start.isEqual(reservation.getArrival()) && isBetweenDates(start, end, reservation.getDeparture())) ||
+                (start.isEqual(existingReservation.getArrival()) && isBetweenDates(start, end, existingReservation.getDeparture())) ||
                 // case 3
-                (isBetweenDates(start, end, reservation.getArrival())) &&
-                        addWholeDay(end).isEqual(reservation.getDeparture()) ||
+                (isBetweenDates(start, end, existingReservation.getArrival())) &&
+                        addWholeDay(end).isEqual(existingReservation.getDeparture()) ||
                 // case 4
-                (start.isBefore(reservation.getArrival()) && addWholeDay(end).isAfter(reservation.getDeparture())) ||
+                (start.isBefore(existingReservation.getArrival()) && addWholeDay(end).isAfter(existingReservation.getDeparture())) ||
                 // case 5
-                (isBetweenDates(start, end, reservation.getArrival()) &&
-                        isBetweenDates(reservation.getArrival(), reservation.getDeparture(), addWholeDay(end))) ||
+                (isBetweenDates(start, end, existingReservation.getArrival()) &&
+                        isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), addWholeDay(end))) ||
                 // case 6
-                (isBetweenDates(start, reservation.getArrival(), reservation.getDeparture()) &&
-                        isBetweenDates(reservation.getArrival(), start, end)) ||
+                (isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), start) &&
+                        isBetweenDates(start, end, existingReservation.getDeparture())) ||
                 // case 7
-                (start.isAfter(reservation.getArrival()) && addWholeDay(end).isBefore(reservation.getDeparture()) ||
+                (start.isAfter(existingReservation.getArrival()) && addWholeDay(end).isBefore(existingReservation.getDeparture()) ||
                 // If nothing above worked check for the cancelled status to return availability
-                reservation.getStatus().getName().equals("CANCELLED"));
+                existingReservation.getStatus().getName().equals("CANCELLED"));
     }
 
     public static Map<String, String> availabilityResponseMessage(String value) {
@@ -51,7 +51,7 @@ public class CampApiUtility {
         return map;
     }
 
-    public static boolean validateDates(@NotNull LocalDateTime start, @NotNull LocalDateTime end) {
+    public static boolean validateArrivalIsBeforeDeparture(@NotNull LocalDateTime start, @NotNull LocalDateTime end) {
         return start.isBefore(end);
     }
 

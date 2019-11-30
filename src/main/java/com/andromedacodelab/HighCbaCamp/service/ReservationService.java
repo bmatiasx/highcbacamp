@@ -1,5 +1,6 @@
 package com.andromedacodelab.HighCbaCamp.service;
 
+import com.andromedacodelab.HighCbaCamp.exception.DateRangeNotAcceptedException;
 import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
 import com.andromedacodelab.HighCbaCamp.exception.InvalidReservationStatusException;
 import com.andromedacodelab.HighCbaCamp.exception.ReservationCancelledException;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -122,9 +124,6 @@ public class ReservationService {
         /* Removes guests that don't belong to the reservation anymore*/
         oldReservation.setGuests(reservation.getGuests());
 
-        // TODO look for the status name in the reservation_statuses table and return the ID to be assigned to the new reservation
-
-
         if (IntStream.range(1, 4).noneMatch(s -> s == reservation.getStatus().getId())) {
             throw new InvalidReservationStatusException();
         } else if (!reservation.getStatus().equals(oldReservation.getStatus())) {
@@ -159,11 +158,16 @@ public class ReservationService {
      */
     private void validateDateRangeConstraints(LocalDateTime arrival, LocalDateTime departure) {
         LocalDate now = LocalDate.now();
+        Period period = Period.between(arrival.toLocalDate(), departure.toLocalDate());
+        Integer dayDifference = period.getDays();
 
         if ((arrival.toLocalDate().isEqual(now.minusDays(1)) || arrival.toLocalDate().isBefore(now.minusDays(1)))
-                && (arrival.toLocalDate().isEqual(now.minusMonths(1)) || arrival.toLocalDate().isBefore(now.minusMonths(1)))) {
+                || (arrival.toLocalDate().isEqual(now.minusMonths(1)) || arrival.toLocalDate().isBefore(
+                        now.minusMonths(1)))) {
             throw new ReservationOutOfTermException();
         }
+
+        if (dayDifference > 4) throw new DateRangeNotAcceptedException();
     }
 
     /**
@@ -190,7 +194,19 @@ public class ReservationService {
      * @param guests set of reservation guests
      */
     public void doGuestExistInRecords(Set<Guest> guests) {
-        guests.stream().filter(g -> (!guestService.guestExists(g))).forEach(guest -> guestService.create(guest));
+        /*guests.stream().filter(g -> !guestService.guestExists(g))
+                .forEach(guest -> guestService.create(guest));*/
+
+        for (Guest guest : guests) {
+            // check if guest has same first name, last name, email
+            if (!guestService.guestExists(guest)) {
+                guestService.create(guest);
+            } else {
+                Integer existingId = guestService.findByExistingGuestId(
+                        guest.getFirstName(), guest.getLastName(), guest.getEmail());
+                guest.setId(existingId);
+            }
+        }
     }
 
     /**

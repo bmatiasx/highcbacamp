@@ -21,4 +21,8 @@ public class GuestService {
     public boolean guestExists(Guest guest) {
         return guestRepository.existsGuestByFirstNameAndLastNameAndEmail(guest.getFirstName(), guest.getLastName(), guest.getEmail());
     }
+
+    public Integer findByExistingGuestId(String firstName, String lastName, String email) {
+        return guestRepository.findGuestByFirstNameAndLastNameAndEmail(firstName, lastName, email).getId();
+    }
 }

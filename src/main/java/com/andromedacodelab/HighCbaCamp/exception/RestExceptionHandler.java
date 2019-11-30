@@ -19,6 +19,7 @@ import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BAD_REQUEST
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BODY_IS_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.CONSTRAINTS_NOT_MET_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATES_ARE_INVALID_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_ACCEPTED_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_AVAILABLE_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.INVALID_RESERVATION_STATUS_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.RESERVATION_CANCELLED_MESSAGE;
@@ -118,6 +119,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         RestApiError restApiError = new RestApiError(
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), RESERVATION_CANCELLED_MESSAGE);
+        return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
+    }
+
+
+    @ExceptionHandler(DateRangeNotAcceptedException .class)
+    protected ResponseEntity<Object> handleDateRangeNotAcceptedException(DateRangeNotAcceptedException ex) {
+        RestApiError restApiError = new RestApiError(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
+                HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), DATE_RANGE_NOT_ACCEPTED_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
     }
 }
