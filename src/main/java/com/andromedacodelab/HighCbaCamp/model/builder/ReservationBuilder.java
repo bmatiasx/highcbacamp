@@ -33,8 +33,8 @@ public class ReservationBuilder {
         return this;
     }
 
-    public ReservationBuilder withGuests(Set<Guest> companions) {
-        reservation.setGuests(companions);
+    public ReservationBuilder withGuests(Set<Guest> guests) {
+        reservation.setGuests(guests);
         return this;
     }
 

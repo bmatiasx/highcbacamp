@@ -1,7 +1,8 @@
 package com.andromedacodelab.HighCbaCamp.controller;
 
+import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
-import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
+import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
 import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
@@ -23,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.convertListToSet;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
@@ -52,27 +54,8 @@ public class ReservationController {
     @ResponseBody
     public ResponseEntity<String> createReservation(@RequestBody JSONObject request) {
 
-        String arrival = request.get("arrival").toString();
-        String departure = request.get("departure").toString();
-        String firstName = request.get("firstName").toString();
-        String lastName = request.get("lastName").toString();
-        String email = request.get("email").toString();
-        List guests = (List) request.get("guests");
-
-        DateFormat formatter = new SimpleDateFormat(YEAR_MONTH_DAY);
-        Date dateArrival = new Date();
-        Date dateDeparture = new Date();
-        try {
-             dateArrival = formatter.parse(arrival);
-             dateDeparture = formatter.parse(departure);
-        } catch (ParseException e) {
-            return ResponseEntity.badRequest().body("A problem occurred on our end");
-        }
-
-        Reservation reservation = reservationService.createReservation(email, firstName, lastName,
-                CampApiUtility.convertToLocalDateTime(dateArrival),
-                CampApiUtility.convertToLocalDateTime(dateDeparture),
-                convertListToSet(guests));
+        ReservationWrapper reservationWrapper = extractReservationFromPutRequest(request, true);
+        Reservation reservation = reservationService.createReservation(reservationWrapper);
 
         return ResponseEntity.ok("Reservation created successfully with bookingId: " + reservation.getBookingId());
     }
@@ -80,35 +63,10 @@ public class ReservationController {
     @PutMapping(path = "/update")
     public ResponseEntity<String> updateReservation(@RequestBody JSONObject request) {
 
-        ReservationWrapper newReservation = extractReservationFromPutRequest(request);
-
+        ReservationWrapper newReservation = extractReservationFromPutRequest(request, false);
         Reservation updatedReservation = reservationService.updateReservation(newReservation);
+
         return ResponseEntity.ok("Updated reservation with bookingId: " + updatedReservation.getBookingId());
-    }
-
-    private ReservationWrapper extractReservationFromPutRequest(JSONObject request) {
-        String arrival = request.get("arrival").toString();
-        String departure = request.get("departure").toString();
-        String bookingId = request.get("bookingId").toString();
-        String statusName = request.get("status").toString();
-        List guests = (List) request.get("guests");
-
-        DateFormat formatter = new SimpleDateFormat(YEAR_MONTH_DAY);
-        Date dateArrival = new Date();
-        Date dateDeparture = new Date();
-        try {
-            dateArrival = formatter.parse(arrival);
-            dateDeparture = formatter.parse(departure);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return new ReservationWrapper(
-                Integer.parseInt(bookingId),
-                CampApiUtility.convertToLocalDateTime(dateArrival),
-                CampApiUtility.convertToLocalDateTime(dateDeparture),
-                convertListToSet(guests),
-                statusName);
     }
 
     @DeleteMapping(path = "/delete")
@@ -126,5 +84,52 @@ public class ReservationController {
 
         return ResponseEntity.ok("Reservation with bookingId " + bookingId + " status was updated to: " +
                 reservationService.updateReservationStatus(bookingId, newStatusId).getStatus().getName());
+    }
+
+    private ReservationWrapper extractReservationFromPutRequest(JSONObject request, boolean isCreate) {
+        ReservationWrapper reservationWrapper;
+
+        String arrival = request.get("arrival").toString();
+        String departure = request.get("departure").toString();
+        List guests = (List) request.get("guests");
+
+        DateFormat formatter = new SimpleDateFormat(YEAR_MONTH_DAY);
+        Date dateArrival = new Date();
+        Date dateDeparture = new Date();
+        try {
+            dateArrival = formatter.parse(arrival);
+            dateDeparture = formatter.parse(departure);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if(isCreate) {
+            String firstName = request.get("firstName").toString();
+            String lastName = request.get("lastName").toString();
+            String email = request.get("email").toString();
+
+            Guest reservationHolder = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
+                    .withEmail(email).withIsReservationHolder(true).build();
+            Set<Guest> guestSet = convertListToSet(guests);
+            guestSet.add(reservationHolder);
+
+            reservationWrapper = new ReservationWrapper(null,
+                    CampApiUtility.convertToLocalDateTime(dateArrival),
+                    CampApiUtility.convertToLocalDateTime(dateDeparture),
+                    guestSet, "");
+        } else {
+            String bookingId = request.get("bookingId").toString();
+            String statusName = request.get("status").toString();
+
+            reservationWrapper =  new ReservationWrapper(
+                    Integer.parseInt(bookingId),
+                    CampApiUtility.convertToLocalDateTime(dateArrival),
+                    CampApiUtility.convertToLocalDateTime(dateDeparture),
+                    convertListToSet(guests),
+                    statusName);
+        }
+
+
+        return reservationWrapper;
     }
 }

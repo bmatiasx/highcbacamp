@@ -31,7 +31,7 @@ public class Reservation {
 
     @Column(name = "\"ARRIVAL\"")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)
-    private LocalDateTime arrival;
+    private  LocalDateTime arrival;
 
     @Column(name = "\"DEPARTURE\"")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)

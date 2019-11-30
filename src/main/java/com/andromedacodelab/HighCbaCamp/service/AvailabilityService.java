@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.doesReservationDatesOverlap;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.addWholeDay;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.isBetweenDates;
 
 @Service
 public class AvailabilityService {
@@ -22,8 +23,6 @@ public class AvailabilityService {
     }
 
     public boolean isReservationDateRangeAvailable(LocalDateTime start, LocalDateTime end) {
-        // TODO handle multiple queries with pessimistic locking of date ranges
-        // see: https://stackoverflow.com/questions/46893237/can-spring-boot-application-handle-multiple-requests-simultaneously
         /* Checks if the initial date is before the end date */
         if (!CampApiUtility.validateArrivalIsBeforeDeparture(start, end)) {
             throw new InvalidDateRangeException();
@@ -32,8 +31,67 @@ public class AvailabilityService {
         List<Reservation> existingReservations = reservationRepository.findAll();
         boolean isDateRangeAvailable = false;
 
+        existingReservations.removeIf(r -> r.getStatus().getName().equals("CANCELLED"));
+
         for (Reservation existingReservation : existingReservations) {
-            isDateRangeAvailable = !doesReservationDatesOverlap(start, end, existingReservation);
+            // case 1
+            if (start.isEqual(existingReservation.getArrival()) && addWholeDay(end).isEqual(
+                    existingReservation.getDeparture())) {
+                isDateRangeAvailable = false;
+                break;
+                // case 2
+            } else if (start.isEqual(existingReservation.getArrival()) && isBetweenDates(start, addWholeDay(end),
+                    existingReservation.getDeparture())) {
+                isDateRangeAvailable = false;
+                break;
+                // case 3
+            } else if (isBetweenDates(start, end, existingReservation.getArrival()) && addWholeDay(end).isEqual(
+                    existingReservation.getDeparture())) {
+                isDateRangeAvailable = false;
+                break;
+                // case 4
+            } else if (start.isBefore(existingReservation.getArrival()) && addWholeDay(end).isAfter(
+                    existingReservation.getDeparture())) {
+                isDateRangeAvailable = false;
+                break;
+                // case 5
+            } else if (isBetweenDates(start, end, existingReservation.getArrival()) &&
+                    isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), addWholeDay(end))) {
+                isDateRangeAvailable = false;
+                break;
+                // case 6
+            } else if((isBetweenDates(start, end, existingReservation.getArrival()) &&
+                    isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), addWholeDay(end)))) {
+                isDateRangeAvailable = false;
+                break;
+                // case 7
+            } else if (start.isAfter(existingReservation.getArrival()) && addWholeDay(end).isBefore(existingReservation.getDeparture())) {
+                isDateRangeAvailable = false;
+                break;
+                // case 8
+            } else if (isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), start) &&
+                    addWholeDay(end).isEqual(existingReservation.getDeparture())) {
+                isDateRangeAvailable = false;
+                break;
+                // case 9
+            } else if(start.isEqual(existingReservation.getArrival()) && isBetweenDates(existingReservation.getArrival(),
+                    existingReservation.getDeparture(), addWholeDay(end))) {
+                isDateRangeAvailable = false;
+                break;
+                // case 10
+            } else if(existingReservations.iterator().hasNext() &&
+                    isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), start) &&
+                    isBetweenDates(existingReservations.iterator().next().getArrival(),
+                            existingReservations.iterator().next().getDeparture(), addWholeDay(end))) {
+                isDateRangeAvailable = false;
+                break;
+                // case 11 (success)
+            } else if (start.isAfter(existingReservation.getDeparture())) {
+                isDateRangeAvailable = true;
+                // case 12 (success)
+            } else if (addWholeDay(end).isBefore(existingReservation.getDeparture())){
+                isDateRangeAvailable = true;
+            }
         }
         return isDateRangeAvailable;
     }

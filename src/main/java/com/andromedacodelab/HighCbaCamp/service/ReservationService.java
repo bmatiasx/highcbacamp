@@ -9,7 +9,6 @@ import com.andromedacodelab.HighCbaCamp.exception.ReservationOutOfTermException;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
-import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationStatusesRepository;
@@ -29,9 +28,7 @@ public class ReservationService {
     private ReservationStatusesRepository reservationStatusesRepository;
     private GuestService guestService;
     private AvailabilityService availabilityService;
-    private static final Integer PENDING_STATUS = 1;
     private static final Integer CONFIRMED_STATUS = 2;
-    private static final Integer ARRIVED_STATUS = 3;
     private static final Integer CANCELLED_STATUS = 4;
 
     @Autowired
@@ -55,38 +52,31 @@ public class ReservationService {
     }
 
     /**
-     * This method is intended for create a Reservation
+     * Create a Reservation
      *
-     * @param email     Represents the e-mail of the user who is the reservation holder
-     * @param firstName is the first name of the reservation holder
-     * @param lastName  is the last name of the reservation holder
-     * @param arrival   represents the starting day of the reservation
-     * @param departure represents the ending day of the reservation
-     * @param guests    the guest companions who are not reservation holders
+     * @param reservationWrapper which is a wrapper class to map from json to an actual domain object
      * @return Reservation object with all details
      */
-    public Reservation createReservation(String email, String firstName, String lastName,
-                                         LocalDateTime arrival, LocalDateTime departure,
-                                         Set<Guest> guests) {
+    public Reservation createReservation(ReservationWrapper reservationWrapper) {
+        Reservation reservation = new ReservationBuilder()
+                .withArrivalDate(reservationWrapper.getArrival())
+                .withDepartureDate(reservationWrapper.getDeparture())
+                .withGuests(reservationWrapper.getGuests()).build();
+
         /* Checks if the provided date range is available to create a reservation*/
-        if (!availabilityService.isReservationDateRangeAvailable(arrival, departure)) {
+        if (!availabilityService.isReservationDateRangeAvailable(
+                reservation.getArrival(), reservation.getDeparture())) {
             throw new InvalidDateRangeException();
         }
 
-        validateDateRangeConstraints(arrival, departure);
+        validateDateRangeConstraints(reservation.getArrival(), reservation.getDeparture());
 
-        Guest reservationHolderGuest = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
-                .withEmail(email).withIsReservationHolder(true).build();
-        guests.add(reservationHolderGuest);
-
+        // TODO lock date range for any concurrent request
         /* Check if the guests already exist in the DB, if not create them with GuestService*/
-        doGuestExistInRecords(guests);
+        doGuestExistInRecords(reservation.getGuests());
 
-        /* Reservation status id 2 = CONFIRMED*/
         ReservationStatus status = reservationStatusesRepository.getOne(CONFIRMED_STATUS);
-
-        Reservation reservation = new ReservationBuilder().withArrivalDate(arrival)
-                .withDepartureDate(departure).withStatus(status).withGuests(guests).build();
+        reservation.setStatus(status);
         try {
             reservationRepository.save(reservation);
         } catch (Exception ex) {
@@ -124,7 +114,7 @@ public class ReservationService {
         /* Removes guests that don't belong to the reservation anymore*/
         oldReservation.setGuests(reservation.getGuests());
 
-        if (IntStream.range(1, 4).noneMatch(s -> s == reservation.getStatus().getId())) {
+        if (IntStream.rangeClosed(1, 4).noneMatch(s -> s == reservation.getStatus().getId())) {
             throw new InvalidReservationStatusException();
         } else if (!reservation.getStatus().equals(oldReservation.getStatus())) {
             oldReservation.setStatus(reservation.getStatus());
@@ -141,7 +131,7 @@ public class ReservationService {
 
         ReservationStatus newReservationStatus = reservationStatusesRepository.getOne(newStatusId);
 
-        if (IntStream.range(1, 4).noneMatch(s -> s == newStatusId)) throw new InvalidReservationStatusException();
+        if (IntStream.rangeClosed(1, 4).noneMatch(s -> s == newStatusId)) throw new InvalidReservationStatusException();
 
         oldReservation.setStatus(newReservationStatus);
 
