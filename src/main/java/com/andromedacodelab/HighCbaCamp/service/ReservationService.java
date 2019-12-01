@@ -27,12 +27,14 @@ import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.substractWhol
 
 @Service
 public class ReservationService {
+
     private ReservationRepository reservationRepository;
     private ReservationStatusesRepository reservationStatusesRepository;
     private GuestService guestService;
     private AvailabilityService availabilityService;
     private static final Integer CONFIRMED_STATUS = 2;
     private static final Integer CANCELLED_STATUS = 4;
+    private final ReentrantLock lock = new ReentrantLock(true);
 
     @Autowired
     public ReservationService(ReservationRepository reservationRepository, GuestService guestService,
@@ -61,8 +63,6 @@ public class ReservationService {
      * @return Reservation object with all details
      */
     public Reservation createReservation(ReservationWrapper reservationWrapper) {
-        ReentrantLock lock = new ReentrantLock(true);
-
         // Lock the current operation for the holding thread
         lock.lock();
         Reservation reservation = new ReservationBuilder()
@@ -103,7 +103,6 @@ public class ReservationService {
      */
     public Reservation updateReservation(ReservationWrapper reservationWrapped) {
         ReservationStatus status = reservationStatusesRepository.findByName(reservationWrapped.getStatusName());
-        ReentrantLock lock = new ReentrantLock(true);
 
         // Lock the current operation for the holding thread
         lock.lock();
@@ -161,8 +160,8 @@ public class ReservationService {
      * 1. The campsite can be reserved for a maximum of 3 days
      * 2. The campsite can be reserved for a minimum of 1 day ahead of arrival and up to 1 month in advance
      *
-     * @param arrival
-     * @param departure
+     * @param arrival date to validate
+     * @param departure date to validate against the above one
      */
     private void validateDateRangeConstraints(LocalDateTime arrival, LocalDateTime departure) {
         LocalDate now = LocalDate.now();
@@ -181,8 +180,8 @@ public class ReservationService {
     /**
      * Checks two reservation dates are the same ignoring hours of day.
      *
-     * @param newReservationDate
-     * @param oldReservationDate
+     * @param newReservationDate the new reservation date
+     * @param oldReservationDate the old reservation date
      * @return true if the dates are equal
      */
     private boolean validateReservationDatesAreEqual(LocalDateTime newReservationDate, LocalDateTime oldReservationDate) {
@@ -201,7 +200,7 @@ public class ReservationService {
      * Validates if the guests already exists, if no then creates new one(s)
      * @param guests set of reservation guests
      */
-    public void doGuestExistInRecords(Set<Guest> guests) {
+    private void doGuestExistInRecords(Set<Guest> guests) {
         for (Guest guest : guests) {
             // check if guest has same first name, last name, email
             if (!guestService.guestExists(guest)) {
