@@ -67,7 +67,7 @@ public class Reservation {
     }
 
     public LocalDateTime getDeparture() {
-        return CampApiUtility.addWholeDay(departure);
+        return CampApiUtility.addWholeDayInHours(departure);
     }
 
     public void setDeparture(LocalDateTime departure) {

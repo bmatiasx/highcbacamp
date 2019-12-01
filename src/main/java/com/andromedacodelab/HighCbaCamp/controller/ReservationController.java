@@ -1,10 +1,7 @@
 package com.andromedacodelab.HighCbaCamp.controller;
 
-import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
-import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.convertListToSet;
-import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.extractReservationFromPutRequest;
 
 @RestController
 @RequestMapping("/api/reservation")
@@ -84,52 +73,5 @@ public class ReservationController {
 
         return ResponseEntity.ok("Reservation with bookingId " + bookingId + " status was updated to: " +
                 reservationService.updateReservationStatus(bookingId, newStatusId).getStatus().getName());
-    }
-
-    private ReservationWrapper extractReservationFromPutRequest(JSONObject request, boolean isCreate) {
-        ReservationWrapper reservationWrapper;
-
-        String arrival = request.get("arrival").toString();
-        String departure = request.get("departure").toString();
-        List guests = (List) request.get("guests");
-
-        DateFormat formatter = new SimpleDateFormat(YEAR_MONTH_DAY);
-        Date dateArrival = new Date();
-        Date dateDeparture = new Date();
-        try {
-            dateArrival = formatter.parse(arrival);
-            dateDeparture = formatter.parse(departure);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if(isCreate) {
-            String firstName = request.get("firstName").toString();
-            String lastName = request.get("lastName").toString();
-            String email = request.get("email").toString();
-
-            Guest reservationHolder = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
-                    .withEmail(email).withIsReservationHolder(true).build();
-            Set<Guest> guestSet = convertListToSet(guests);
-            guestSet.add(reservationHolder);
-
-            reservationWrapper = new ReservationWrapper(null,
-                    CampApiUtility.convertToLocalDateTime(dateArrival),
-                    CampApiUtility.convertToLocalDateTime(dateDeparture),
-                    guestSet, "");
-        } else {
-            String bookingId = request.get("bookingId").toString();
-            String statusName = request.get("status").toString();
-
-            reservationWrapper =  new ReservationWrapper(
-                    Integer.parseInt(bookingId),
-                    CampApiUtility.convertToLocalDateTime(dateArrival),
-                    CampApiUtility.convertToLocalDateTime(dateDeparture),
-                    convertListToSet(guests),
-                    statusName);
-        }
-
-
-        return reservationWrapper;
     }
 }

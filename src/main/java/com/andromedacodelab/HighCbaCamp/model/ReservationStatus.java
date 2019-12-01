@@ -20,6 +20,13 @@ public class ReservationStatus {
     @JsonIgnore
     private Integer id;
 
+    public ReservationStatus() {
+    }
+
+    public ReservationStatus(String name) {
+        this.name = name;
+    }
+
     @Column(name = "\"NAME\"")
     private String name;
 
