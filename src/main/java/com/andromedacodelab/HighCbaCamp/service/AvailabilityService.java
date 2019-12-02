@@ -31,7 +31,7 @@ public class AvailabilityService {
         List<Reservation> existingReservations = reservationRepository.findAll();
         boolean isDateRangeAvailable = false;
 
-        /*existingReservations.removeIf(r -> r.getStatus().getName().equals("CANCELLED"));*/
+        existingReservations.removeIf(r -> r.getStatus().getName().equals("CANCELLED"));
 
         for (Reservation existingReservation : existingReservations) {
             // case 1

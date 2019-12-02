@@ -1,12 +1,14 @@
 package com.andromedacodelab.HighCbaCamp.service;
 
 import com.andromedacodelab.HighCbaCamp.TestUtil;
+import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
+import com.andromedacodelab.HighCbaCamp.repository.ReservationStatusesRepository;
 import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
 import org.junit.Assert;
@@ -25,16 +27,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.substractWholeDayInHours;
+
 public class ReservationServiceTests {
     @InjectMocks
     private ReservationService reservationService;
 
-    @InjectMocks
+    @Mock
     private AvailabilityService availabilityService;
+
+    @Mock
+    private GuestService guestService;
 
     @Mock
     private ReservationRepository reservationRepository;
 
+    @Mock
+    private ReservationStatusesRepository reservationStatusesRepository;
 
     @Before
     public void setUp() {
@@ -54,16 +63,15 @@ public class ReservationServiceTests {
     }
 
     @Test
-    public void givenReservationParameters_whenCreateReservation_thenReturnOkMessage() {
+    public void givenReservationParameters_whenCreateReservation_thenReturnValidReservation() {
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
                 .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
         Guest guest2 = new GuestBuilder().withId(2).withFirstName("Joe").withLastName("Albarn")
                 .withEmail("ja@hotmail.com").withIsReservationHolder(false).build();
         Set<Guest> guests = new HashSet<>(Arrays.asList(guest1, guest2));
 
-        ReservationWrapper wrapper = createNewReservationWrapper("2020-05-20", "2020-05-20",
+        ReservationWrapper wrapper = createNewReservationWrapper("2020-05-20", "2020-05-23",
                 guests);
-
 
         Reservation reservation = createNewReservationBasedInWrapper(wrapper);
         List<Reservation> reservationList = new ArrayList<>();
@@ -74,12 +82,56 @@ public class ReservationServiceTests {
         Mockito.when(reservationRepository.findAll())
                 .thenReturn(reservationList);
         Mockito.when(availabilityService.isReservationDateRangeAvailable(
-                reservation.getArrival(), reservation.getDeparture()))
+                reservation.getArrival(), substractWholeDayInHours(reservation.getDeparture())))
                 .thenReturn(true);
+        Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(reservationStatusesRepository.getOne(2))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
 
         Reservation result = reservationService.createReservation(wrapper);
 
         Assert.assertEquals(reservation.getBookingId(), result.getBookingId());
+
+    }
+
+    @Test(expected = InvalidDateRangeException.class)
+    public void givenReservationParameters_whenCreateReservation_thenReturnError() {
+        Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
+                .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
+        Guest guest2 = new GuestBuilder().withId(2).withFirstName("Joe").withLastName("Albarn")
+                .withEmail("ja@hotmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests1 = new HashSet<>(Arrays.asList(guest1, guest2));
+
+        Guest guest3 = new GuestBuilder().withId(3).withFirstName("Robert").withLastName("Benjamin")
+                .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
+        Guest guest4 = new GuestBuilder().withId(4).withFirstName("Casey").withLastName("Jones")
+                .withEmail("ja@hotmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests2 = new HashSet<>(Arrays.asList(guest3, guest4));
+
+        // case 2 overlapping reservations
+        ReservationWrapper wrapper1 = createNewReservationWrapper("2020-05-24", "2020-05-27",
+                guests1);
+        ReservationWrapper wrapper2 = createNewReservationWrapper("2020-05-23", "2020-05-27",
+                guests2);
+
+        Reservation reservation1 = createNewReservationBasedInWrapper(wrapper1);
+        Reservation reservation2 = createNewReservationBasedInWrapper(wrapper2);
+        List<Reservation> reservationList = new ArrayList<>();
+        reservationList.add(reservation1);
+        reservationList.add(reservation2);
+
+        Mockito.when(reservationRepository.save(reservation1))
+                .thenReturn(reservation1);
+        Mockito.when(reservationRepository.findAll())
+                .thenReturn(reservationList);
+        /*Mockito.when(availabilityService.isReservationDateRangeAvailable(
+                reservation1.getArrival(), substractWholeDayInHours(reservation1.getDeparture())))
+                .thenThrow(new InvalidDateRangeException());*/
+
+        Reservation result = reservationService.createReservation(wrapper1);
+
+        Assert.assertEquals(reservation1.getBookingId(), result.getBookingId());
 
     }
 

@@ -200,7 +200,7 @@ public class ReservationService {
      * Validates if the guests already exists, if no then creates new one(s)
      * @param guests set of reservation guests
      */
-    private void doGuestExistInRecords(Set<Guest> guests) {
+    public void doGuestExistInRecords(Set<Guest> guests) {
         for (Guest guest : guests) {
             // check if guest has same first name, last name, email
             if (!guestService.guestExists(guest)) {
