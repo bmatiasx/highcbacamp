@@ -1,6 +1,6 @@
 package com.andromedacodelab.HighCbaCamp.model;
 
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
+import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 
@@ -67,7 +67,7 @@ public class Reservation {
     }
 
     public LocalDateTime getDeparture() {
-        return CampApiUtility.addWholeDayInHours(departure);
+        return CampApiUtil.addWholeDayInHours(departure);
     }
 
     public void setDeparture(LocalDateTime departure) {

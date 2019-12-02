@@ -20,14 +20,14 @@ import java.util.Set;
 
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
 
-public class CampApiUtility {
+public class CampApiUtil {
     public static LocalDateTime convertToLocalDateTime(Date dateToConvert) {
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
 
-    public static LocalDateTime customParseStringToDate(String dateToConvert) {
+    public static LocalDateTime customParseStringToLocalDateTime(String dateToConvert) {
         DateFormat formatter = new SimpleDateFormat(YEAR_MONTH_DAY);
         Date date = new Date();
         try {
@@ -104,8 +104,8 @@ public class CampApiUtility {
             guestSet.add(reservationHolder);
 
             reservationWrapper = new ReservationWrapper(null,
-                    customParseStringToDate(arrival),
-                    customParseStringToDate(departure),
+                    customParseStringToLocalDateTime(arrival),
+                    customParseStringToLocalDateTime(departure),
                     guestSet, "");
         } else {
             String bookingId = request.get("bookingId").toString();
@@ -113,8 +113,8 @@ public class CampApiUtility {
 
             reservationWrapper =  new ReservationWrapper(
                     Integer.parseInt(bookingId),
-                    customParseStringToDate(arrival),
-                    customParseStringToDate(departure),
+                    customParseStringToLocalDateTime(arrival),
+                    customParseStringToLocalDateTime(departure),
                     convertListToSet(guests),
                     statusName);
         }

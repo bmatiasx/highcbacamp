@@ -1,7 +1,7 @@
 package com.andromedacodelab.HighCbaCamp.controller;
 
 import com.andromedacodelab.HighCbaCamp.service.AvailabilityService;
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
+import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -46,18 +46,18 @@ public class AvailabilityController {
             start = LocalDateTime.now();
             end = start.plusMonths(1);
         } else {
-            start = CampApiUtility.convertToLocalDateTime(startDate);
-            end = CampApiUtility.convertToLocalDateTime(endDate);
+            start = CampApiUtil.convertToLocalDateTime(startDate);
+            end = CampApiUtil.convertToLocalDateTime(endDate);
         }
 
         if (availabilityService.isReservationDateRangeAvailable(start, end)) {
             return new ResponseEntity<>(
-                    CampApiUtility.availabilityResponseMessage("The date range [arrival: " +
+                    CampApiUtil.availabilityResponseMessage("The date range [arrival: " +
                             start.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) +
                             ", departure: " + end.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) + "] is available!"),
                     HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(CampApiUtility.availabilityResponseMessage("The date range [arrival: " +
+            return new ResponseEntity<>(CampApiUtil.availabilityResponseMessage("The date range [arrival: " +
                     start.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) +
                     ", departure: " + end.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) + "] is not available")
                     , HttpStatus.CONFLICT);

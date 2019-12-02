@@ -3,15 +3,15 @@ package com.andromedacodelab.HighCbaCamp.service;
 import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.addWholeDayInHours;
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.isBetweenDates;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.addWholeDayInHours;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.isBetweenDates;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.validateArrivalIsBeforeDeparture;
 
 @Service
 public class AvailabilityService {
@@ -24,14 +24,14 @@ public class AvailabilityService {
 
     public boolean isReservationDateRangeAvailable(LocalDateTime start, LocalDateTime end) {
         /* Checks if the initial date is before the end date */
-        if (!CampApiUtility.validateArrivalIsBeforeDeparture(start, end)) {
+        if (!validateArrivalIsBeforeDeparture(start, end)) {
             throw new InvalidDateRangeException();
         }
 
         List<Reservation> existingReservations = reservationRepository.findAll();
         boolean isDateRangeAvailable = false;
 
-        existingReservations.removeIf(r -> r.getStatus().getName().equals("CANCELLED"));
+        /*existingReservations.removeIf(r -> r.getStatus().getName().equals("CANCELLED"));*/
 
         for (Reservation existingReservation : existingReservations) {
             // case 1

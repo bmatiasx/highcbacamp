@@ -27,6 +27,10 @@ public class ReservationStatus {
         this.name = name;
     }
 
+    public ReservationStatus(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
     @Column(name = "\"NAME\"")
     private String name;
 

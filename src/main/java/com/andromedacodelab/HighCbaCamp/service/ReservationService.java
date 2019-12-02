@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtility.substractWholeDayInHours;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.substractWholeDayInHours;
 
 @Service
 public class ReservationService {
