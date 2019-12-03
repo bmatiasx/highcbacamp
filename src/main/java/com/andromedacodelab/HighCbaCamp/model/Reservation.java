@@ -37,7 +37,7 @@ public class Reservation {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)
     private LocalDateTime departure;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "\"STATUS_ID\"")
     @JsonRawValue
     private ReservationStatus status;
@@ -67,7 +67,7 @@ public class Reservation {
     }
 
     public LocalDateTime getDeparture() {
-        return CampApiUtil.addWholeDayInHours(departure);
+        return departure;
     }
 
     public void setDeparture(LocalDateTime departure) {

@@ -58,10 +58,6 @@ public class CampApiUtil {
         return endDay.plusHours(23).plusMinutes(59);
     }
 
-    public static LocalDateTime substractWholeDayInHours(LocalDateTime date) {
-        return date.minusHours(24).minusMinutes(59);
-    }
-
     public static Set<Guest> convertListToSet(List<Map<String, String>> guests) {
         Set<Guest> guestSet = new HashSet<>();
 

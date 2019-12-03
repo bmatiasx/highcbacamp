@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.substractWholeDayInHours;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.addWholeDayInHours;
 
 @Service
 public class ReservationService {
@@ -53,7 +53,9 @@ public class ReservationService {
      * @return Reservation object with all details
      */
     public Reservation findReservationByBookingId(Integer bookingId) {
-        return getReservation(bookingId);
+        Reservation reservation = getReservation(bookingId);
+        reservation.setDeparture(addWholeDayInHours(reservation.getDeparture()));
+        return reservation;
     }
 
     /**
@@ -67,7 +69,7 @@ public class ReservationService {
         lock.lock();
         Reservation reservation = new ReservationBuilder()
                 .withArrivalDate(reservationWrapper.getArrival())
-                .withDepartureDate(substractWholeDayInHours(reservationWrapper.getDeparture()))
+                .withDepartureDate(reservationWrapper.getDeparture())
                 .withGuests(reservationWrapper.getGuests()).build();
 
         // Checks if the provided date range is available to create a reservation
@@ -128,19 +130,21 @@ public class ReservationService {
         if (IntStream.rangeClosed(1, 4).noneMatch(s -> s == reservation.getStatus().getId())) {
             throw new InvalidReservationStatusException();
         } else if (!reservation.getStatus().equals(oldReservation.getStatus())) {
+            // Updates status if needed
             oldReservation.setStatus(reservation.getStatus());
         }
 
         // Validates if the date range is the same than the persisted reservation
         validateChangesInDateRange(reservation, oldReservation);
         try {
-            return reservationRepository.save(oldReservation);
+            reservationRepository.save(oldReservation);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             throw new RuntimeException("Reservation could not be updated");
         } finally {
             lock.unlock();
         }
+        return oldReservation;
     }
 
     public Reservation updateReservationStatus(Integer bookingId, Integer newStatusId) {
@@ -200,7 +204,7 @@ public class ReservationService {
      * Validates if the guests already exists, if no then creates new one(s)
      * @param guests set of reservation guests
      */
-    public void doGuestExistInRecords(Set<Guest> guests) {
+    private void doGuestExistInRecords(Set<Guest> guests) {
         for (Guest guest : guests) {
             // check if guest has same first name, last name, email
             if (!guestService.guestExists(guest)) {
@@ -232,7 +236,7 @@ public class ReservationService {
         if (!validateReservationDatesAreEqual(reservation.getArrival(), oldReservation.getArrival())) {
             // Update the old reservation ARRIVAL date
             if (!availabilityService.isReservationDateRangeAvailable(
-                    reservation.getArrival(), oldReservation.getDeparture())) throw new InvalidDateRangeException();
+                    reservation.getArrival(), reservation.getDeparture())) throw new InvalidDateRangeException();
 
             // Then lock the dates for the new date range and unlock the old so the change can be persisted
             oldReservation.setArrival(reservation.getArrival());

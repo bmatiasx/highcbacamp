@@ -5,7 +5,10 @@ import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
+import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
+import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +34,24 @@ public class TestUtil {
                 .withDepartureDate(customParseStringToLocalDateTime(departure))
                 .withStatus(status)
                 .withGuests(guests)
+                .build();
+    }
+
+    public static ReservationWrapper createNewReservationWrapper(String arrivalDate, String departureDate, Set<Guest> guests) {
+        LocalDateTime arrival = CampApiUtil.customParseStringToLocalDateTime(arrivalDate);
+        LocalDateTime departure = CampApiUtil.customParseStringToLocalDateTime(departureDate);
+
+        ReservationStatus status = new ReservationStatus(2, "CONFIRMED");
+
+        return new ReservationWrapper(null, arrival, departure, guests, status.getName());
+    }
+
+    public static Reservation createNewReservationBasedInWrapper(ReservationWrapper wrapper) {
+        return new ReservationBuilder()
+                /*.withBookingId()*/
+                .withArrivalDate(wrapper.getArrival())
+                .withDepartureDate(wrapper.getDeparture())
+                .withGuests(wrapper.getGuests())
                 .build();
     }
 }

@@ -13,6 +13,7 @@ public class RestApiConstants {
     public static final String RESOURCE_NOT_EXISTS_MESSAGE = "Resource does not exists";
     public static final String SERVER_ERROR_MESSAGE = "Oops, there was a problem on our end";
     public static final String BODY_IS_MISSING_MESSAGE = "Required request body is missing";
+    public static final String NO_RESERVATION_FOUND_TO_DELETE_MESSAGE = "The reservation you're trying to delete doesn't exists";
     public static final String RESERVATION_CANCELLED_MESSAGE = "The reservation you're trying to modify is cancelled";
     public static final String DATE_RANGE_NOT_ACCEPTED_MESSAGE = "The chosen date range exceeds the reservation" +
             " constraint. Choose less days";

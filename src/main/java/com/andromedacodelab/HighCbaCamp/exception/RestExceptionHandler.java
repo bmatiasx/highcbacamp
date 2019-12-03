@@ -1,5 +1,6 @@
 package com.andromedacodelab.HighCbaCamp.exception;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATES_ARE_I
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_ACCEPTED_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_AVAILABLE_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.INVALID_RESERVATION_STATUS_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.NO_RESERVATION_FOUND_TO_DELETE_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.RESERVATION_CANCELLED_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.RESERVATION_NOT_SAVED_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS;
@@ -129,5 +131,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
                 HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), DATE_RANGE_NOT_ACCEPTED_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    protected ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
+        RestApiError restApiError = new RestApiError(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
+                HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(),
+                NO_RESERVATION_FOUND_TO_DELETE_MESSAGE);
+        return new ResponseEntity<>(restApiError, HttpStatus.NOT_FOUND);
     }
 }

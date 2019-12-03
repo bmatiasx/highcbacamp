@@ -6,10 +6,8 @@ import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
-import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationStatusesRepository;
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -27,7 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.substractWholeDayInHours;
+import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationBasedInWrapper;
+import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationWrapper;
 
 public class ReservationServiceTests {
     @InjectMocks
@@ -82,9 +80,11 @@ public class ReservationServiceTests {
         Mockito.when(reservationRepository.findAll())
                 .thenReturn(reservationList);
         Mockito.when(availabilityService.isReservationDateRangeAvailable(
-                reservation.getArrival(), substractWholeDayInHours(reservation.getDeparture())))
+                reservation.getArrival(), reservation.getDeparture()))
                 .thenReturn(true);
         Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(guestService.guestExists(guest2))
                 .thenReturn(true);
         Mockito.when(reservationStatusesRepository.getOne(2))
                 .thenReturn(new ReservationStatus(2, "CONFIRMED"));
@@ -92,7 +92,6 @@ public class ReservationServiceTests {
         Reservation result = reservationService.createReservation(wrapper);
 
         Assert.assertEquals(reservation.getBookingId(), result.getBookingId());
-
     }
 
     @Test(expected = InvalidDateRangeException.class)
@@ -121,35 +120,159 @@ public class ReservationServiceTests {
         reservationList.add(reservation1);
         reservationList.add(reservation2);
 
-        Mockito.when(reservationRepository.save(reservation1))
-                .thenReturn(reservation1);
-        Mockito.when(reservationRepository.findAll())
-                .thenReturn(reservationList);
-        /*Mockito.when(availabilityService.isReservationDateRangeAvailable(
-                reservation1.getArrival(), substractWholeDayInHours(reservation1.getDeparture())))
-                .thenThrow(new InvalidDateRangeException());*/
+        Mockito.when(reservationRepository.save(reservation1)).thenReturn(reservation1);
+        Mockito.when(reservationRepository.findAll()).thenReturn(reservationList);
 
         Reservation result = reservationService.createReservation(wrapper1);
 
         Assert.assertEquals(reservation1.getBookingId(), result.getBookingId());
-
     }
 
-    public ReservationWrapper createNewReservationWrapper(String arrivalDate, String departureDate, Set<Guest> guests) {
-        LocalDateTime arrival = CampApiUtil.customParseStringToLocalDateTime(arrivalDate);
-        LocalDateTime departure = CampApiUtil.customParseStringToLocalDateTime(departureDate);
+    @Test
+    public void givenDateRangeWithCancelledReservation_whenSaveReservation_thenReturnValidReservation() {
+        // case with one reservation cancelled
+        Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
+                .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
+        Guest guest2 = new GuestBuilder().withId(2).withFirstName("Joe").withLastName("Albarn")
+                .withEmail("jalbarn@hotmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests1 = new HashSet<>(Arrays.asList(guest1, guest2));
 
-        ReservationStatus status = new ReservationStatus(2, "CONFIRMED");
+        Guest guest3 = new GuestBuilder().withId(3).withFirstName("Robert").withLastName("Benjamin")
+                .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
+        Guest guest4 = new GuestBuilder().withId(4).withFirstName("Casey").withLastName("Jones")
+                .withEmail("casey@hotmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests2 = new HashSet<>(Arrays.asList(guest3, guest4));
 
-        return new ReservationWrapper(null, arrival, departure, guests, status.getName());
+        ReservationWrapper wrapper1 = createNewReservationWrapper("2020-05-20", "2020-05-22",
+                guests1);
+        ReservationWrapper wrapper2 = createNewReservationWrapper("2020-05-20", "2020-05-22",
+                guests2);
+
+        Reservation reservation1 = createNewReservationBasedInWrapper(wrapper1);
+        Reservation reservation2 = createNewReservationBasedInWrapper(wrapper2);
+        reservation1.setBookingId(4);
+        reservation1.setStatus(new ReservationStatus(2, "CONFIRMED"));
+        reservation2.setBookingId(4);
+        reservation2.setStatus(new ReservationStatus(2, "CANCELLED"));
+        List<Reservation> reservationList = new ArrayList<>();
+        reservationList.add(reservation1);
+        reservationList.add(reservation2);
+
+        Mockito.when(availabilityService.isReservationDateRangeAvailable(
+                reservation1.getArrival(), reservation1.getDeparture()))
+                .thenReturn(true);
+        Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(reservationStatusesRepository.getOne(2))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
+        Mockito.when(reservationStatusesRepository.getOne(4))
+                .thenReturn(new ReservationStatus(4, "CANCELLED"));
+        Mockito.when(reservationRepository.save(reservation1)).thenReturn(reservation1);
+        Mockito.when(reservationRepository.findAll()).thenReturn(reservationList);
+
+        Reservation result = reservationService.createReservation(wrapper1);
+
+        Assert.assertEquals(reservation1.getDeparture(), result.getDeparture());
+        Assert.assertEquals(reservation1.getArrival(), result.getArrival());
     }
 
-    public Reservation createNewReservationBasedInWrapper(ReservationWrapper wrapper) {
-        return new ReservationBuilder()
-                /*.withBookingId()*/
-                .withArrivalDate(wrapper.getArrival())
-                .withDepartureDate(wrapper.getDeparture())
-                .withGuests(wrapper.getGuests())
-                .build();
+    @Test
+    public void givenReservationParameters_whenUpdateReservationStatus_thenReturnValidReservation() {
+        Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
+                .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
+        Guest guest2 = new GuestBuilder().withId(2).withFirstName("Joe").withLastName("Albarn")
+                .withEmail("jalbarn@hotmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests1 = new HashSet<>(Arrays.asList(guest1, guest2));
+
+        ReservationWrapper newReservationWrapper = createNewReservationWrapper("2020-05-20", "2020-05-22",
+                guests1);
+        ReservationWrapper oldReservationWrapper = createNewReservationWrapper("2020-05-20", "2020-05-22",
+                guests1);
+        newReservationWrapper.setBookingId(3);
+        oldReservationWrapper.setBookingId(3);
+
+        newReservationWrapper.setStatusName("CANCELLED");
+        newReservationWrapper.setStatus(new ReservationStatus(4, newReservationWrapper.getStatusName()));
+
+        Reservation reservationNewState = createNewReservationBasedInWrapper(newReservationWrapper);
+        Reservation oldReservation = createNewReservationBasedInWrapper(oldReservationWrapper);
+        oldReservation.setStatus(new ReservationStatus(2, "CONFIRMED"));
+
+        List<Reservation> reservationList = new ArrayList<>();
+        reservationList.add(oldReservation);
+
+        Mockito.when(availabilityService.isReservationDateRangeAvailable(
+                reservationNewState.getArrival(), reservationNewState.getDeparture()))
+                .thenReturn(true);
+        Mockito.when(reservationRepository.findById(3))
+                .thenReturn(Optional.of(oldReservation));
+        Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(reservationStatusesRepository.getOne(2))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
+        Mockito.when(reservationStatusesRepository.getOne(4))
+                .thenReturn(new ReservationStatus(4, "CANCELLED"));
+        Mockito.when(reservationStatusesRepository.findByName(newReservationWrapper.getStatusName()))
+                .thenReturn(new ReservationStatus(4, "CANCELLED"));
+        Mockito.when(reservationRepository.save(reservationNewState)).thenReturn(oldReservation);
+        Mockito.when(reservationRepository.findAll()).thenReturn(reservationList);
+
+        Reservation result = reservationService.updateReservation(newReservationWrapper);
+
+        Assert.assertEquals(oldReservation.getStatus().getId(), result.getStatus().getId());
+    }
+
+    @Test
+    public void givenReservationParameters_whenUpdateReservationDates_thenReturnValidReservation() {
+        Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
+                .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
+        Guest guest2 = new GuestBuilder().withId(2).withFirstName("Joe").withLastName("Albarn")
+                .withEmail("jalbarn@hotmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests1 = new HashSet<>(Arrays.asList(guest1, guest2));
+
+        ReservationWrapper newReservationWrapper = createNewReservationWrapper("2020-05-15", "2020-05-17",
+                guests1);
+        ReservationWrapper oldReservationWrapper = createNewReservationWrapper("2020-05-20", "2020-05-22",
+                guests1);
+        newReservationWrapper.setBookingId(3);
+        oldReservationWrapper.setBookingId(3);
+
+        newReservationWrapper.setStatusName("CONFIRMED");
+        newReservationWrapper.setStatus(new ReservationStatus(2, newReservationWrapper.getStatusName()));
+
+        Reservation updatedReservation = createNewReservationBasedInWrapper(newReservationWrapper);
+        Reservation oldReservation = createNewReservationBasedInWrapper(oldReservationWrapper);
+        oldReservation.setStatus(new ReservationStatus(2, "CONFIRMED"));
+        updatedReservation.setStatus(new ReservationStatus(2, "CONFIRMED"));
+
+        List<Reservation> reservationList = new ArrayList<>();
+        reservationList.add(oldReservation);
+
+        Mockito.when(availabilityService.isReservationDateRangeAvailable(
+                updatedReservation.getArrival(), updatedReservation.getDeparture()))
+                .thenReturn(true);
+        Mockito.when(reservationRepository.findById(3))
+                .thenReturn(Optional.of(oldReservation));
+        Mockito.when(availabilityService.isReservationDateRangeAvailable(
+                updatedReservation.getArrival(), updatedReservation.getDeparture()))
+                .thenReturn(true);
+        Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(guestService.guestExists(guest1))
+                .thenReturn(true);
+        Mockito.when(reservationStatusesRepository.getOne(2))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
+        Mockito.when(reservationStatusesRepository.findByName("CONFIRMED"))
+                .thenReturn(new ReservationStatus(4, "CONFIRMED"));
+        Mockito.when(reservationRepository.save(updatedReservation)).thenReturn(oldReservation);
+        Mockito.when(reservationRepository.findAll()).thenReturn(reservationList);
+
+        Reservation result = reservationService.updateReservation(newReservationWrapper);
+
+        Assert.assertEquals(oldReservation.getArrival(), result.getArrival());
     }
  }

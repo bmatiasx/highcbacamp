@@ -34,62 +34,64 @@ public class AvailabilityService {
         existingReservations.removeIf(r -> r.getStatus().getName().equals("CANCELLED"));
 
         for (Reservation existingReservation : existingReservations) {
+            LocalDateTime existingArrival = existingReservation.getArrival();
+            LocalDateTime existingDeparture = addWholeDayInHours(existingReservation.getDeparture());
             // case 1
-            if (start.isEqual(existingReservation.getArrival()) && addWholeDayInHours(end).isEqual(
-                    existingReservation.getDeparture())) {
+            if (start.isEqual(existingArrival) && addWholeDayInHours(end).isEqual(
+                    existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
                 // case 2
-            } else if (start.isEqual(existingReservation.getArrival()) && isBetweenDates(start, addWholeDayInHours(end),
-                    existingReservation.getDeparture())) {
+            } else if (start.isEqual(existingArrival) && isBetweenDates(start, addWholeDayInHours(end),
+                    existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
                 // case 3
-            } else if (isBetweenDates(start, end, existingReservation.getArrival()) && addWholeDayInHours(end).isEqual(
-                    existingReservation.getDeparture())) {
+            } else if (isBetweenDates(start, end, existingArrival) && addWholeDayInHours(end).isEqual(
+                    existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
                 // case 4
-            } else if (start.isBefore(existingReservation.getArrival()) && addWholeDayInHours(end).isAfter(
-                    existingReservation.getDeparture())) {
+            } else if (start.isBefore(existingArrival) && addWholeDayInHours(end).isAfter(
+                    existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
                 // case 5
-            } else if (isBetweenDates(start, end, existingReservation.getArrival()) &&
-                    isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), addWholeDayInHours(end))) {
+            } else if (isBetweenDates(start, end, existingArrival) &&
+                    isBetweenDates(existingArrival, existingDeparture, addWholeDayInHours(end))) {
                 isDateRangeAvailable = false;
                 break;
                 // case 6
-            } else if (isBetweenDates(start, end, existingReservation.getDeparture()) &&
-                    end.isAfter(existingReservation.getDeparture())) {
+            } else if (isBetweenDates(start, end, existingDeparture) &&
+                    end.isAfter(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
                 // case 7
-            } else if (start.isAfter(existingReservation.getArrival()) && addWholeDayInHours(end).isBefore(existingReservation.getDeparture())) {
+            } else if (start.isAfter(existingArrival) && addWholeDayInHours(end).isBefore(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
                 // case 8
-            } else if (isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), start) &&
-                    addWholeDayInHours(end).isEqual(existingReservation.getDeparture())) {
+            } else if (isBetweenDates(existingArrival, existingDeparture, start) &&
+                    addWholeDayInHours(end).isEqual(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
                 // case 9
-            } else if(start.isEqual(existingReservation.getArrival()) && isBetweenDates(existingReservation.getArrival(),
-                    existingReservation.getDeparture(), addWholeDayInHours(end))) {
+            } else if(start.isEqual(existingArrival) && isBetweenDates(existingArrival,
+                    existingDeparture, addWholeDayInHours(end))) {
                 isDateRangeAvailable = false;
                 break;
                 // case 10
             } else if(existingReservations.iterator().hasNext() &&
-                    isBetweenDates(existingReservation.getArrival(), existingReservation.getDeparture(), start) &&
+                    isBetweenDates(existingArrival, existingDeparture, start) &&
                     isBetweenDates(existingReservations.iterator().next().getArrival(),
                             existingReservations.iterator().next().getDeparture(), addWholeDayInHours(end))) {
                 isDateRangeAvailable = false;
                 break;
                 // case 11 (success)
-            } else if (start.isAfter(existingReservation.getDeparture())) {
+            } else if (start.isAfter(existingDeparture)) {
                 isDateRangeAvailable = true;
                 // case 12 (success)
-            } else if (addWholeDayInHours(end).isBefore(existingReservation.getDeparture())){
+            } else if (addWholeDayInHours(end).isBefore(existingDeparture)){
                 isDateRangeAvailable = true;
             }
         }
