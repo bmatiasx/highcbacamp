@@ -137,7 +137,6 @@ public class CampApiUtil {
     public static void validateRequestParameters(String arrival, String departure, List guests, List<String> parameters) throws ParamsMissingException {
         if (arrival.isEmpty()) parameters.add(ARRIVAL_PARAM_MISSING_MESSAGE);
         if (departure.isEmpty()) parameters.add(DEPARTURE_PARAM_MISSING_MESSAGE);
-        if (guests.size() == 0) parameters.add(GUEST_PARAM_MISSING_MESSAGE);
 
         if (parameters.size() > 0) throw new ParamsMissingException(parameters);
     }

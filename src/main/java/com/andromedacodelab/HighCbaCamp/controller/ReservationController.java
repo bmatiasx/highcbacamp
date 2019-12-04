@@ -1,5 +1,6 @@
 package com.andromedacodelab.HighCbaCamp.controller;
 
+import com.andromedacodelab.HighCbaCamp.exception.NotSavedReservationException;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
@@ -45,6 +46,7 @@ public class ReservationController {
 
         ReservationWrapper reservationWrapper = extractReservationFromPutRequest(request, true);
         Reservation reservation = reservationService.createReservation(reservationWrapper);
+        if (reservation == null) throw new NotSavedReservationException();
 
         return ResponseEntity.ok("Reservation created successfully with bookingId: " + reservation.getBookingId());
     }
@@ -54,6 +56,7 @@ public class ReservationController {
 
         ReservationWrapper newReservation = extractReservationFromPutRequest(request, false);
         Reservation updatedReservation = reservationService.updateReservation(newReservation);
+        if (updatedReservation == null) throw new NotSavedReservationException();
 
         return ResponseEntity.ok("Updated reservation with bookingId: " + updatedReservation.getBookingId());
     }

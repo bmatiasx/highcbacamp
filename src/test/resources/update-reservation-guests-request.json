@@ -1,0 +1,26 @@
+{
+  "bookingId": 5,
+  "arrival": "2020-05-10",
+  "departure": "2020-05-12",
+  "status": "CONFIRMED",
+  "guests": [
+    {
+      "firstName": "Derrick",
+      "lastName": "McKenzie",
+      "email": "dmckenzie@gmail.com",
+      "reservationHolder": true
+    },
+    {
+      "firstName": "Robert",
+      "lastName": "Harris",
+      "email": "rob.harris@gmail.com",
+      "reservationHolder": false
+    },
+    {
+      "firstName": "Ellen",
+      "lastName": "Woods",
+      "email": "e.woods@gmail.com",
+      "reservationHolder": false
+    }
+  ]
+}

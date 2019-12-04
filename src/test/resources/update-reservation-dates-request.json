@@ -1,8 +1,8 @@
 {
   "bookingId": 5,
-  "arrival": "2020-05-10",
-  "departure": "2020-05-12",
-  "status": "CANCELLED",
+  "arrival": "2020-05-15",
+  "departure": "2020-05-17",
+  "status": "CONFIRMED",
   "guests": [
     {
       "firstName": "Derrick",

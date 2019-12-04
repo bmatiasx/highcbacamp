@@ -6,8 +6,8 @@
   "email": "rama@gmail.com",
   "guests": [
     {
-      "firstName": "Pridgen",
-      "lastName": "Thomas",
+      "firstName": "Thomas",
+      "lastName": "Pridgen",
       "email": "pridgent@gmail.com",
       "reservationHolder": false
     },

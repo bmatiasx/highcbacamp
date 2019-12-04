@@ -79,7 +79,9 @@ public class ReservationService {
             throw new InvalidDateRangeException();
         }
 
-        validateDateRangeConstraints(reservation.getArrival(), reservation.getDeparture());
+        if (validateDateRangeConstraints(reservation.getArrival(), reservation.getDeparture())) {
+            throw new DateRangeNotAcceptedException();
+        }
 
         // Check if the guests already exist in the DB, if not create them with GuestService
         doGuestExistInRecords(reservation.getGuests());
@@ -90,7 +92,6 @@ public class ReservationService {
             reservationRepository.save(reservation);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("Reservation could not be created");
         } finally {
             lock.unlock();
         }
@@ -141,7 +142,6 @@ public class ReservationService {
             reservationRepository.save(oldReservation);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
-            throw new RuntimeException("Reservation could not be updated");
         } finally {
             lock.unlock();
         }
@@ -168,10 +168,10 @@ public class ReservationService {
      * @param arrival date to validate
      * @param departure date to validate against the above one
      */
-    public void validateDateRangeConstraints(LocalDateTime arrival, LocalDateTime departure) {
+    public boolean validateDateRangeConstraints(LocalDateTime arrival, LocalDateTime departure) {
         LocalDate now = LocalDate.now();
         Period period = Period.between(arrival.toLocalDate(), departure.toLocalDate());
-        Integer dayDifference = period.getDays();
+        int dayDifference = period.getDays();
 
         if ((arrival.toLocalDate().isEqual(now.minusDays(1)) || arrival.toLocalDate().isBefore(now.minusDays(1)))
                 || (arrival.toLocalDate().isEqual(now.minusMonths(1)) || arrival.toLocalDate().isBefore(
@@ -179,7 +179,7 @@ public class ReservationService {
             throw new ReservationOutOfTermException();
         }
 
-        if (dayDifference > 4) throw new DateRangeNotAcceptedException();
+        return (dayDifference > 4);
     }
 
     /**
