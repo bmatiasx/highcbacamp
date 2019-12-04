@@ -1,0 +1,28 @@
+{
+  "arrival": "2020-08-14",
+  "departure": "2020-08-20",
+  "firstName": "Eros",
+  "lastName": "Ramazzotti",
+  "email": "rama@gmail.com",
+  "guests": [
+    {
+      "firstName": "Pridgen",
+      "lastName": "Thomas",
+      "email": "pridgent@gmail.com",
+      "reservationHolder": false
+    },
+    {
+      "firstName": "Pino",
+      "lastName": "Palladino",
+      "email": "pino.palladino@gmail.com",
+      "reservationHolder": false
+    },
+    {
+      "firstName": "Nathan",
+      "lastName": "East",
+      "email": "nathan.east@gmail.com",
+      "reservationHolder": false
+    }
+
+  ]
+}

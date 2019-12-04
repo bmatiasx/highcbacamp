@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.convertToLocalDateTime;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
 
 @RestController
@@ -41,13 +42,19 @@ public class AvailabilityController {
 
         LocalDateTime start;
         LocalDateTime end;
-        if (startDate == null || endDate == null) {
+        if (startDate == null && endDate == null) {
             /* Use the default date range which is 1 month*/
             start = LocalDateTime.now();
             end = start.plusMonths(1);
+        } else if (endDate == null){
+            start = convertToLocalDateTime(startDate);
+            end = start.plusMonths(1);
+        } else if (startDate == null) {
+            end = convertToLocalDateTime(endDate);
+            start = end.minusMonths(1);
         } else {
-            start = CampApiUtil.convertToLocalDateTime(startDate);
-            end = CampApiUtil.convertToLocalDateTime(endDate);
+            start = convertToLocalDateTime(startDate);
+            end = convertToLocalDateTime(endDate);
         }
 
         if (availabilityService.isReservationDateRangeAvailable(start, end)) {

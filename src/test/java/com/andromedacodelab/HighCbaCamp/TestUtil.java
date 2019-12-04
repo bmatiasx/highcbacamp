@@ -7,7 +7,13 @@ import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -48,10 +54,22 @@ public class TestUtil {
 
     public static Reservation createNewReservationBasedInWrapper(ReservationWrapper wrapper) {
         return new ReservationBuilder()
-                /*.withBookingId()*/
                 .withArrivalDate(wrapper.getArrival())
                 .withDepartureDate(wrapper.getDeparture())
                 .withGuests(wrapper.getGuests())
                 .build();
+    }
+
+    public static String parseFileToJson(String path) {
+        String object = "";
+        JSONParser jsonParser = new JSONParser();
+
+        try (FileReader reader = new FileReader(path)) {
+            object = jsonParser.parse(reader).toString();
+        } catch (IOException | ParseException ex) {
+            ex.printStackTrace();
+        }
+
+        return object;
     }
 }

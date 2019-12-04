@@ -1,6 +1,5 @@
 package com.andromedacodelab.HighCbaCamp.model;
 
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 

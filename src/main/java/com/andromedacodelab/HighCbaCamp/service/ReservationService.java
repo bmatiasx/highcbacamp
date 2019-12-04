@@ -3,6 +3,7 @@ package com.andromedacodelab.HighCbaCamp.service;
 import com.andromedacodelab.HighCbaCamp.exception.DateRangeNotAcceptedException;
 import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
 import com.andromedacodelab.HighCbaCamp.exception.InvalidReservationStatusException;
+import com.andromedacodelab.HighCbaCamp.exception.NonExistentReservationForDeleteException;
 import com.andromedacodelab.HighCbaCamp.exception.ReservationCancelledException;
 import com.andromedacodelab.HighCbaCamp.exception.ReservationNotFoundException;
 import com.andromedacodelab.HighCbaCamp.exception.ReservationOutOfTermException;
@@ -167,7 +168,7 @@ public class ReservationService {
      * @param arrival date to validate
      * @param departure date to validate against the above one
      */
-    private void validateDateRangeConstraints(LocalDateTime arrival, LocalDateTime departure) {
+    public void validateDateRangeConstraints(LocalDateTime arrival, LocalDateTime departure) {
         LocalDate now = LocalDate.now();
         Period period = Period.between(arrival.toLocalDate(), departure.toLocalDate());
         Integer dayDifference = period.getDays();
@@ -197,7 +198,14 @@ public class ReservationService {
      * @param id that belongs to the reservation to delete
      */
     public void delete(Integer id) {
-        reservationRepository.deleteById(id);
+        lock.lock();
+        try {
+            reservationRepository.deleteById(id);
+        } catch (NonExistentReservationForDeleteException ex) {
+            throw new NonExistentReservationForDeleteException();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**

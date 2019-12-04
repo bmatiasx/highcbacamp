@@ -6,10 +6,6 @@ public class ReservationNotFoundException extends RuntimeException {
     public ReservationNotFoundException() {
     }
 
-    public ReservationNotFoundException(String s) {
-        super(s);
-    }
-
     public ReservationNotFoundException(Integer bookingId) {
         this.bookingId = bookingId;
     }

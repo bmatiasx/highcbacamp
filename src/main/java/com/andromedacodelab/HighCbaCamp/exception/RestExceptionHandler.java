@@ -20,6 +20,7 @@ import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BAD_REQUEST
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BODY_IS_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.CONSTRAINTS_NOT_MET_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATES_ARE_INVALID_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATES_ARE_NOT_VALID_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_ACCEPTED_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DATE_RANGE_NOT_AVAILABLE_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.INVALID_RESERVATION_STATUS_MESSAGE;
@@ -140,5 +141,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(),
                 NO_RESERVATION_FOUND_TO_DELETE_MESSAGE);
         return new ResponseEntity<>(restApiError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DateFormatIsInvalidException.class)
+    protected ResponseEntity<Object> handleDateFormatIsInvalidException(DateFormatIsInvalidException ex) {
+        RestApiError restApiError = new RestApiError(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                DATES_ARE_NOT_VALID_MESSAGE);
+        return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ParamsMissingException.class)
+    protected ResponseEntity<Object> handleParamsMissingException(ParamsMissingException ex) {
+        RestApiError restApiError = new RestApiError(
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage());
+        return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
     }
 }

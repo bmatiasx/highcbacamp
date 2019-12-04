@@ -17,11 +17,13 @@ public class RestApiConstants {
     public static final String RESERVATION_CANCELLED_MESSAGE = "The reservation you're trying to modify is cancelled";
     public static final String DATE_RANGE_NOT_ACCEPTED_MESSAGE = "The chosen date range exceeds the reservation" +
             " constraint. Choose less days";
-    public static final String ARRIVAL_PARAM_MISSING_MESSAGE = "Arrival date is missing";
-    public static final String DEPARTURE_PARAM_MISSING_MESSAGE = "Departure date is missing";
-    public static final String BOOKING_ID_PARAM_MISSING_MESSAGE = "Booking id is missing";
-    public static final String STATUS_PARAM_MISSING_MESSAGE = "Status is missing";
-    public static final String GUEST_PARAM_MISSING_MESSAGE = "Guests are missing";
+    public static final String DATES_ARE_NOT_VALID_MESSAGE = "Arrival or departure date has not the yyyy-MM-dd format";
+    public static final String MISSING_PARAMS_INITIAL_MESSAGE = "The following problem(s) were found: ";
+    public static final String ARRIVAL_PARAM_MISSING_MESSAGE = "arrival date is missing";
+    public static final String DEPARTURE_PARAM_MISSING_MESSAGE = "departure date is missing";
+    public static final String BOOKING_ID_PARAM_MISSING_MESSAGE = "booking id is missing";
+    public static final String STATUS_PARAM_MISSING_MESSAGE = "status is missing";
+    public static final String GUEST_PARAM_MISSING_MESSAGE = "guests are missing";
     public static final String YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS = "yyyy-MM-dd hh:mm:ss a";
     public static final String YEAR_MONTH_DAY = "yyyy-MM-dd";
 }

@@ -1,5 +1,10 @@
 package com.andromedacodelab.HighCbaCamp.util;
 
+import com.andromedacodelab.HighCbaCamp.exception.DateFormatIsInvalidException;
+import com.andromedacodelab.HighCbaCamp.exception.DateRangeNotAcceptedException;
+import com.andromedacodelab.HighCbaCamp.exception.DateRangeNotAvailableException;
+import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
+import com.andromedacodelab.HighCbaCamp.exception.ParamsMissingException;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import org.json.simple.JSONObject;
@@ -11,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.ARRIVAL_PARAM_MISSING_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BOOKING_ID_PARAM_MISSING_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DEPARTURE_PARAM_MISSING_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.GUEST_PARAM_MISSING_MESSAGE;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.STATUS_PARAM_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
 
 public class CampApiUtil {
@@ -33,7 +44,7 @@ public class CampApiUtil {
         try {
             date = formatter.parse(dateToConvert);
         } catch (ParseException e) {
-            e.printStackTrace();
+            throw new DateFormatIsInvalidException();
         }
 
         return convertToLocalDateTime(date);
@@ -84,6 +95,7 @@ public class CampApiUtil {
 
     public static ReservationWrapper extractReservationFromPutRequest(JSONObject request, boolean isCreate) {
         ReservationWrapper reservationWrapper;
+        List<String> paramListForValidate = new ArrayList<>();
 
         String arrival = request.get("arrival").toString();
         String departure = request.get("departure").toString();
@@ -93,6 +105,8 @@ public class CampApiUtil {
             String firstName = request.get("firstName").toString();
             String lastName = request.get("lastName").toString();
             String email = request.get("email").toString();
+
+            validateRequestParameters(arrival, departure, guests, paramListForValidate);
 
             Guest reservationHolder = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
                     .withEmail(email).withIsReservationHolder(true).build();
@@ -107,6 +121,8 @@ public class CampApiUtil {
             String bookingId = request.get("bookingId").toString();
             String statusName = request.get("status").toString();
 
+            validateRequestParameters(arrival, departure, guests, bookingId, statusName, paramListForValidate);
+
             reservationWrapper =  new ReservationWrapper(
                     Integer.parseInt(bookingId),
                     customParseStringToLocalDateTime(arrival),
@@ -116,5 +132,20 @@ public class CampApiUtil {
         }
 
         return reservationWrapper;
+    }
+
+    public static void validateRequestParameters(String arrival, String departure, List guests, List<String> parameters) throws ParamsMissingException {
+        if (arrival.isEmpty()) parameters.add(ARRIVAL_PARAM_MISSING_MESSAGE);
+        if (departure.isEmpty()) parameters.add(DEPARTURE_PARAM_MISSING_MESSAGE);
+        if (guests.size() == 0) parameters.add(GUEST_PARAM_MISSING_MESSAGE);
+
+        if (parameters.size() > 0) throw new ParamsMissingException(parameters);
+    }
+
+    public static void validateRequestParameters(String arrival, String departure, List guests, String bookingId,
+                                                  String statusName, List<String> parameters) throws ParamsMissingException{
+        if (bookingId.isEmpty()) parameters.add(BOOKING_ID_PARAM_MISSING_MESSAGE);
+        if (statusName.isEmpty()) parameters.add(STATUS_PARAM_MISSING_MESSAGE);
+        validateRequestParameters(arrival, departure, guests, parameters);
     }
 }

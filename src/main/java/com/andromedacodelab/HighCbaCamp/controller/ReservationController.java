@@ -41,7 +41,7 @@ public class ReservationController {
 
     @PostMapping(path = "/create")
     @ResponseBody
-    public ResponseEntity<String> createReservation(@RequestBody JSONObject request) {
+    public ResponseEntity<String> createReservation(@RequestBody JSONObject request) throws Exception {
 
         ReservationWrapper reservationWrapper = extractReservationFromPutRequest(request, true);
         Reservation reservation = reservationService.createReservation(reservationWrapper);
@@ -50,7 +50,7 @@ public class ReservationController {
     }
 
     @PutMapping(path = "/update")
-    public ResponseEntity<String> updateReservation(@RequestBody JSONObject request) {
+    public ResponseEntity<String> updateReservation(@RequestBody JSONObject request) throws Exception {
 
         ReservationWrapper newReservation = extractReservationFromPutRequest(request, false);
         Reservation updatedReservation = reservationService.updateReservation(newReservation);

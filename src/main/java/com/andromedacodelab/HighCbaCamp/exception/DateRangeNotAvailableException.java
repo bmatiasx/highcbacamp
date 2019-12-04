@@ -4,8 +4,4 @@ public class DateRangeNotAvailableException extends RuntimeException {
 
     public DateRangeNotAvailableException() {
     }
-
-    public DateRangeNotAvailableException(String s) {
-        super(s);
-    }
 }
