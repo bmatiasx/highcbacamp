@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -24,6 +26,7 @@ import java.util.Set;
 
 import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationBasedInWrapper;
 import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationWrapper;
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -118,5 +121,19 @@ public class AvailabilityControllerTests {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", is("The date range [arrival: 2021-04-10, departure: 2021-05-10] is available!")));
+    }
+
+    @Test
+    public void givenEmptyDateRange_whenGetAvailability_thenReturnAvailableMessage() throws Exception {
+        // case when no dates are provided then use now() as the starting date
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY));
+        String endDate = LocalDateTime.now().plusMonths(1).format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY));
+        when(reservationRepository.findAll()).thenReturn(reservationList);
+
+        mockMvc.perform(get("/api/availability")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message",
+                        is("The date range [arrival: " + now + ", departure: " + endDate + "] is available!")));
     }
 }

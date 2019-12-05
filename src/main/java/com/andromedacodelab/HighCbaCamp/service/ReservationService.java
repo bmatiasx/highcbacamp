@@ -73,14 +73,14 @@ public class ReservationService {
                 .withDepartureDate(reservationWrapper.getDeparture())
                 .withGuests(reservationWrapper.getGuests()).build();
 
+        if (validateDateRangeConstraints(reservation.getArrival(), reservation.getDeparture())) {
+            throw new DateRangeNotAcceptedException();
+        }
+
         // Checks if the provided date range is available to create a reservation
         if (!availabilityService.isReservationDateRangeAvailable(
                 reservation.getArrival(), reservation.getDeparture())) {
             throw new InvalidDateRangeException();
-        }
-
-        if (validateDateRangeConstraints(reservation.getArrival(), reservation.getDeparture())) {
-            throw new DateRangeNotAcceptedException();
         }
 
         // Check if the guests already exist in the DB, if not create them with GuestService
@@ -249,7 +249,7 @@ public class ReservationService {
             // Then lock the dates for the new date range and unlock the old so the change can be persisted
             oldReservation.setArrival(reservation.getArrival());
         }
-        if (validateReservationDatesAreEqual(reservation.getDeparture(), oldReservation.getDeparture())) {
+        if (!validateReservationDatesAreEqual(reservation.getDeparture(), oldReservation.getDeparture())) {
             // Update the old reservation DEPARTURE date
             if (!availabilityService.isReservationDateRangeAvailable(
                     oldReservation.getArrival(), reservation.getDeparture())) throw new InvalidDateRangeException();

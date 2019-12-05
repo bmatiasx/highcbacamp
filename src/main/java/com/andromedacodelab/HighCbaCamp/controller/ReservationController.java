@@ -69,7 +69,6 @@ public class ReservationController {
     }
 
     @PutMapping(path = "/update/status")
-    @ResponseBody
     public ResponseEntity<Object> updateReservationStatus(@RequestBody JSONObject request) {
         Integer bookingId = Integer.parseInt(request.get("bookingId").toString());
         Integer newStatusId = Integer.parseInt(request.get("statusId").toString());

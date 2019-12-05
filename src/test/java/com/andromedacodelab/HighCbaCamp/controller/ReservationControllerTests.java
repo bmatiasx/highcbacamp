@@ -1,6 +1,5 @@
 package com.andromedacodelab.HighCbaCamp.controller;
 
-import com.andromedacodelab.HighCbaCamp.exception.DateRangeNotAcceptedException;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
@@ -10,8 +9,8 @@ import com.andromedacodelab.HighCbaCamp.repository.ReservationStatusesRepository
 import com.andromedacodelab.HighCbaCamp.service.AvailabilityService;
 import com.andromedacodelab.HighCbaCamp.service.GuestService;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
-import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.NestedServletException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +36,7 @@ import static com.andromedacodelab.HighCbaCamp.TestUtil.parseFileToJson;
 import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.customParseStringToLocalDateTime;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -67,14 +68,17 @@ public class ReservationControllerTests {
 
     private List<Reservation> reservationList;
 
-    private Set<Guest> guests;
-
     private static final String JSON_CREATE_REQUEST_PATH = "src/test/resources/create-reservation-request.json";
     private static final String JSON_CREATE_INVALID_DATES_REQUEST_PATH =
             "src/test/resources/create-reservation-invalid-dates-request.json";
-    private static final String JSON_UPDATE_REQUEST_PATH = "src/test/resources/update-reservation-status-request.json";
-    private static final String JSON_UPDATE_GUESTS_REQUEST_PATH = "src/test/resources/update-reservation-guests-request.json";
-    private static final String JSON_UPDATE_DATES_REQUEST_PATH = "src/test/resources/update-reservation-dates-request.json";
+    private static final String JSON_UPDATE_REQUEST_PATH =
+            "src/test/resources/update-reservation-status-request.json";
+    private static final String JSON_UPDATE_GUESTS_REQUEST_PATH =
+            "src/test/resources/update-reservation-guests-request.json";
+    private static final String JSON_UPDATE_DATES_REQUEST_PATH =
+            "src/test/resources/update-reservation-dates-request.json";
+    private static final String JSON_UPDATE_STATUS_ONLY_REQUEST_PATH =
+            "src/test/resources/update-reservation-status-only-request.json";
 
     @Before
     public void setUp() {
@@ -130,10 +134,6 @@ public class ReservationControllerTests {
         when(availabilityService.isReservationDateRangeAvailable(
                 reservation.getArrival(), reservation.getDeparture()))
                 .thenReturn(true);
-        when(guestService.guestExists(guest1))
-                .thenReturn(true);
-        when(guestService.guestExists(guest2))
-                .thenReturn(true);
         when(reservationStatusesRepository.getOne(2))
                 .thenReturn(new ReservationStatus(2, "CONFIRMED"));
 
@@ -174,16 +174,12 @@ public class ReservationControllerTests {
         when(availabilityService.isReservationDateRangeAvailable(
                 reservation.getArrival(), reservation.getDeparture()))
                 .thenReturn(true);
-        when(guestService.guestExists(guest1))
-                .thenReturn(true);
-        when(guestService.guestExists(guest2))
-                .thenReturn(true);
         when(reservationStatusesRepository.getOne(2))
                 .thenReturn(new ReservationStatus(2, "CONFIRMED"));
         when(reservationStatusesRepository.getOne(4))
                 .thenReturn(new ReservationStatus(4, "CANCELLED"));
         when(reservationStatusesRepository.findByName("CANCELLED"))
-                .thenReturn(new ReservationStatus(2, "CANCELLED"));
+                .thenReturn(new ReservationStatus(4, "CANCELLED"));
         when(reservationRepository.findAll()).thenReturn(reservationList);
 
         String jsonRequest = parseFileToJson(JSON_UPDATE_REQUEST_PATH);
@@ -194,59 +190,12 @@ public class ReservationControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         is("Updated reservation with bookingId: " + reservation.getBookingId())));
-    }
-
-    @Test
-    public void givenReservationRequest_whenUpdateReservationGuests_thenReturnOkStatus()  throws Exception {
-        Guest guest1 = new GuestBuilder().withId(1).withFirstName("Derrick").withLastName("McKenzie")
-                .withEmail("dmckenzie@gmail.com").withIsReservationHolder(true).build();
-        Guest guest2 = new GuestBuilder().withId(2).withFirstName("Robert").withLastName("Harris")
-                .withEmail("rob.harris@gmail.com").withIsReservationHolder(false).build();
-        Guest guest3 = new GuestBuilder().withId(3).withFirstName("Ellen").withLastName("Woods")
-                .withEmail("e.woods@gmail.com").withIsReservationHolder(false).build();
-        Guest guest4 = new GuestBuilder().withId(4).withFirstName("Paul").withLastName("Turner")
-                .withEmail("paul.turner@gmail.com").withIsReservationHolder(false).build();
-        Set<Guest> guests = new HashSet<>(Arrays.asList(guest1, guest2, guest3, guest4));
-        ReservationWrapper wrapper = createNewReservationWrapper("2020-05-10", "2020-05-12",
-                guests);
-        wrapper.setStatus(new ReservationStatus(2, "CONFIRMED"));
-        Reservation reservation = createNewReservationBasedInWrapper(wrapper);
-        reservation.setBookingId(5);
-        reservation.setStatus(new ReservationStatus(2, "CONFIRMED"));
-
-        when(reservationRepository.findById(reservation.getBookingId()))
-                .thenReturn(Optional.of(reservation));
-        when(reservationRepository.save(reservation))
-                .thenReturn(reservation);
-        when(reservationRepository.findAll())
-                .thenReturn(reservationList);
-        when(availabilityService.isReservationDateRangeAvailable(
-                reservation.getArrival(), reservation.getDeparture()))
-                .thenReturn(true);
-        when(guestService.guestExists(guest1))
-                .thenReturn(true);
-        when(guestService.guestExists(guest2))
-                .thenReturn(true);
-        when(reservationStatusesRepository.getOne(2))
-                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
-        when(reservationStatusesRepository.getOne(4))
-                .thenReturn(new ReservationStatus(4, "CANCELLED"));
-        when(reservationStatusesRepository.findByName("CONFIRMED"))
-                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
-        when(reservationRepository.findAll()).thenReturn(reservationList);
-
-        String jsonRequest = parseFileToJson(JSON_UPDATE_GUESTS_REQUEST_PATH);
-
-        mockMvc.perform(put("/api/reservation/update")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                        is("Updated reservation with bookingId: " + reservation.getBookingId())));
+        Assert.assertEquals("CANCELLED", reservation.getStatus().getName());
     }
 
     @Test
     public void givenReservationRequest_whenUpdateReservationDates_thenReturnOkStatus()  throws Exception {
+        // case when dates are updated and available to change then update them
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Derrick").withLastName("McKenzie")
                 .withEmail("dmckenzie@gmail.com").withIsReservationHolder(true).build();
         Guest guest2 = new GuestBuilder().withId(2).withFirstName("Robert").withLastName("Harris")
@@ -269,13 +218,6 @@ public class ReservationControllerTests {
                 .thenReturn(reservation);
         when(reservationRepository.findAll())
                 .thenReturn(reservationList);
-        when(availabilityService.isReservationDateRangeAvailable(
-                customParseStringToLocalDateTime("2020-05-10"), customParseStringToLocalDateTime("2020-05-12")))
-                .thenThrow(new DateRangeNotAcceptedException());
-        when(guestService.guestExists(guest1))
-                .thenReturn(true);
-        when(guestService.guestExists(guest2))
-                .thenReturn(true);
         when(reservationStatusesRepository.getOne(2))
                 .thenReturn(new ReservationStatus(2, "CONFIRMED"));
         when(reservationStatusesRepository.findByName("CONFIRMED"))
@@ -290,11 +232,14 @@ public class ReservationControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         is("Updated reservation with bookingId: " + reservation.getBookingId())));
+        Assert.assertEquals(customParseStringToLocalDateTime("2020-05-15"), reservation.getArrival());
+        Assert.assertEquals(customParseStringToLocalDateTime("2020-05-17"), reservation.getDeparture());
     }
 
 
-    /*@Test*//*(expected = DateRangeNotAcceptedException.class)*//*
-    public void givenReservationRequestWithInvalidDates_whenCreateReservation_thenReturnErrorMessage() throws Exception{
+    @Test(expected = NestedServletException.class)
+    public void givenReservationRequestWithInvalidDates_whenCreateReservation_thenReturnErrorMessage() throws Exception {
+        // case when the dates don't meet the constraints for booking
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Derrick").withLastName("McKenzie")
                 .withEmail("dmckenzie@gmail.com").withIsReservationHolder(true).build();
         Guest guest2 = new GuestBuilder().withId(2).withFirstName("Robert").withLastName("Harris")
@@ -314,17 +259,13 @@ public class ReservationControllerTests {
                 .thenReturn(reservation);
         when(reservationRepository.findAll())
                 .thenReturn(reservationList);
+        when(reservationService.validateDateRangeConstraints(reservation.getArrival(), reservation.getDeparture()))
+                .thenReturn(true);
         when(availabilityService.isReservationDateRangeAvailable(
                 reservation.getArrival(), reservation.getDeparture()))
                 .thenReturn(true);
-        when(guestService.guestExists(guest1))
-                .thenReturn(true);
-        when(guestService.guestExists(guest2))
-                .thenReturn(true);
         when(reservationStatusesRepository.getOne(2))
                 .thenReturn(new ReservationStatus(2, "CONFIRMED"));
-        when(reservationStatusesRepository.getOne(4))
-                .thenReturn(new ReservationStatus(4, "CANCELLED"));
         when(reservationStatusesRepository.findByName("CONFIRMED"))
                 .thenReturn(new ReservationStatus(2, "CONFIRMED"));
         when(reservationRepository.findAll()).thenReturn(reservationList);
@@ -337,7 +278,105 @@ public class ReservationControllerTests {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message",
                         is("The chosen date range exceeds the reservation constraint. Choose less days")));
-    }*/
+    }
 
+    @Test
+    public void givenReservationRequest_whenUpdateReservationGuests_thenReturnOkStatus()  throws Exception {
+        // case when updating the guests by removing one
+        Guest guest1 = new GuestBuilder().withId(1).withFirstName("Derrick").withLastName("McKenzie")
+                .withEmail("dmckenzie@gmail.com").withIsReservationHolder(true).build();
+        Guest guest2 = new GuestBuilder().withId(2).withFirstName("Robert").withLastName("Harris")
+                .withEmail("rob.harris@gmail.com").withIsReservationHolder(false).build();
+        Guest guest3 = new GuestBuilder().withId(3).withFirstName("Ellen").withLastName("Woods")
+                .withEmail("e.woods@gmail.com").withIsReservationHolder(false).build();
+        Guest guest4 = new GuestBuilder().withId(4).withFirstName("Paul").withLastName("Turner")
+                .withEmail("paul.turner@gmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests = new HashSet<>(Arrays.asList(guest1, guest2, guest3, guest4));
+        ReservationWrapper wrapper = createNewReservationWrapper("2020-05-10", "2020-05-12",
+                guests);
+        wrapper.setStatus(new ReservationStatus(2, "CONFIRMED"));
+        Reservation reservation = createNewReservationBasedInWrapper(wrapper);
+        reservation.setBookingId(5);
+        reservation.setStatus(new ReservationStatus(2, "CONFIRMED"));
 
+        when(reservationRepository.findById(reservation.getBookingId()))
+                .thenReturn(Optional.of(reservation));
+        when(reservationRepository.save(reservation))
+                .thenReturn(reservation);
+        when(reservationRepository.findAll())
+                .thenReturn(reservationList);
+        when(availabilityService.isReservationDateRangeAvailable(
+                reservation.getArrival(), reservation.getDeparture()))
+                .thenReturn(true);
+        when(reservationStatusesRepository.getOne(2))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
+        when(reservationStatusesRepository.findByName("CONFIRMED"))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
+        when(reservationRepository.findAll()).thenReturn(reservationList);
+
+        String jsonRequest = parseFileToJson(JSON_UPDATE_GUESTS_REQUEST_PATH);
+
+        mockMvc.perform(put("/api/reservation/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        is("Updated reservation with bookingId: " + reservation.getBookingId())));
+        Assert.assertEquals(3, reservation.getGuests().size());
+    }
+
+    @Test
+    public void givenNewStatus_whenUpdateReservationStatusOnly_thenReturnOKMessage() throws Exception {
+        Guest guest1 = new GuestBuilder().withId(1).withFirstName("Derrick").withLastName("McKenzie")
+                .withEmail("dmckenzie@gmail.com").withIsReservationHolder(true).build();
+        Guest guest2 = new GuestBuilder().withId(2).withFirstName("Robert").withLastName("Harris")
+                .withEmail("rob.harris@gmail.com").withIsReservationHolder(false).build();
+        Guest guest3 = new GuestBuilder().withId(3).withFirstName("Ellen").withLastName("Woods")
+                .withEmail("e.woods@gmail.com").withIsReservationHolder(false).build();
+        Guest guest4 = new GuestBuilder().withId(4).withFirstName("Paul").withLastName("Turner")
+                .withEmail("paul.turner@gmail.com").withIsReservationHolder(false).build();
+        Set<Guest> guests = new HashSet<>(Arrays.asList(guest1, guest2, guest3, guest4));
+        ReservationWrapper wrapper = createNewReservationWrapper("2020-05-10", "2020-05-12",
+                guests);
+        wrapper.setStatus(new ReservationStatus(2, "CONFIRMED"));
+        Reservation reservation = createNewReservationBasedInWrapper(wrapper);
+        reservation.setBookingId(2);
+        reservation.setStatus(new ReservationStatus(2, "CONFIRMED"));
+
+        when(reservationRepository.findById(reservation.getBookingId()))
+                .thenReturn(Optional.of(reservation));
+        when(reservationRepository.save(reservation))
+                .thenReturn(reservation);
+        when(reservationRepository.findAll())
+                .thenReturn(reservationList);
+        when(availabilityService.isReservationDateRangeAvailable(
+                reservation.getArrival(), reservation.getDeparture()))
+                .thenReturn(true);
+        when(reservationStatusesRepository.getOne(2))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
+        when(reservationStatusesRepository.findByName("CONFIRMED"))
+                .thenReturn(new ReservationStatus(2, "CONFIRMED"));
+        when(reservationStatusesRepository.getOne(4))
+                .thenReturn(new ReservationStatus(4, "CANCELLED"));
+        when(reservationRepository.findAll()).thenReturn(reservationList);
+
+        String jsonRequest = parseFileToJson(JSON_UPDATE_STATUS_ONLY_REQUEST_PATH);
+
+        mockMvc.perform(put("/api/reservation/update/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",
+                        is("Reservation with bookingId " + reservation.getBookingId()
+                        + " status was updated to: " + reservation.getStatus().getName())));
+    }
+
+    @Test
+    public void givenBookingId_whenDeleteReservation_thenReturnOKStatus() throws Exception {
+        mockMvc.perform(delete("/api/reservation/delete?bookingId={bookingId}", 3)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is("Deleted reservation with bookingId: 3")));
+    }
 }
