@@ -179,7 +179,7 @@ public class ReservationService {
             throw new ReservationOutOfTermException();
         }
 
-        return (dayDifference > 4);
+        return dayDifference > 4;
     }
 
     /**

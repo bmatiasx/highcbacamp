@@ -1,0 +1,28 @@
+{
+  "arrival": "2020-05-24",
+  "departure": "2020-05-27",
+  "firstName": "Alex",
+  "lastName": "Keit",
+  "email": "alexkeit@gmail.com",
+  "guests": [
+    {
+      "firstName": "Thomas",
+      "lastName": "Pridgen",
+      "email": "pridgent@gmail.com",
+      "reservationHolder": false
+    },
+    {
+      "firstName": "Pino",
+      "lastName": "Palladino",
+      "email": "pino.palladino@gmail.com",
+      "reservationHolder": false
+    },
+    {
+      "firstName": "Nathan",
+      "lastName": "East",
+      "email": "nathan.east@gmail.com",
+      "reservationHolder": false
+    }
+
+  ]
+}

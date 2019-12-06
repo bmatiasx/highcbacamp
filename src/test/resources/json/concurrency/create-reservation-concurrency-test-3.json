@@ -1,0 +1,21 @@
+{
+  "arrival": "2021-07-10",
+  "departure": "2021-07-13",
+  "firstName": "Marie",
+  "lastName": "Curie",
+  "email": "mariecurie@gmail.com",
+  "guests": [
+    {
+      "firstName": "Robert",
+      "lastName": "Biro",
+      "email": "birorobert@gmail.com",
+      "reservationHolder": false
+    },
+    {
+      "firstName": "Albert",
+      "lastName": "Einstein",
+      "email": "albert.einstein@gmail.com",
+      "reservationHolder": false
+    }
+  ]
+}

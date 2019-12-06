@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +59,7 @@ public class CampApiUtil {
     }
 
     public static boolean validateArrivalIsBeforeDeparture(@NotNull LocalDateTime start, @NotNull LocalDateTime end) {
-        return start.isBefore(end);
+        return start.isBefore(end) || start.isEqual(end);
     }
 
     public static boolean isBetweenDates(LocalDateTime start, LocalDateTime end, LocalDateTime target) {
@@ -110,8 +111,13 @@ public class CampApiUtil {
 
             Guest reservationHolder = new GuestBuilder().withFirstName(firstName).withLastName(lastName)
                     .withEmail(email).withIsReservationHolder(true).build();
-            Set<Guest> guestSet = convertListToSet(guests);
-            guestSet.add(reservationHolder);
+            Set<Guest> guestSet = new HashSet<>();
+            if (guests != null) {
+                guestSet = convertListToSet(guests);
+                guestSet.add(reservationHolder);
+            } else {
+                guestSet.add(reservationHolder);
+            }
 
             reservationWrapper = new ReservationWrapper(null,
                     customParseStringToLocalDateTime(arrival),
