@@ -23,7 +23,7 @@ To run unit and integration tests
 mvn clean test
 ````
 
-Ide output:
+IDE output for coverage:
 
 ![alt text](https://github.com/bmatiasx/highcbacamp/blob/master/src/test/resources/img/test_coverage.png)
 
