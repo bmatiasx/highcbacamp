@@ -22,6 +22,11 @@ To run unit and integration tests
 ````
 mvn clean test
 ````
+
+Ide output:
+
+![alt text](https://github.com/bmatiasx/highcbacamp/blob/master/src/test/resources/img/test_coverage.png)
+
 ### Concurrent test case
 The concurrency scenario can be run from CLI navigating to the project directory
  `src/test/resources/json/concurrency` and then with _curl_ command as follows:
