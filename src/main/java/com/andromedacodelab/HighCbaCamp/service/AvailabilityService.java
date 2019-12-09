@@ -21,6 +21,12 @@ public class AvailabilityService {
         this.reservationRepository = reservationRepository;
     }
 
+    /**
+     *  Checks if a given date range is available
+     * @param start the possible arrival date
+     * @param end the possible departure date
+     * @return true if there is not overlapping with other reservations, otherwise returns false
+     */
     public boolean isReservationDateRangeAvailable(LocalDate start, LocalDate end) {
         /* Checks if the initial date is before the end date */
         if (!validateArrivalIsBeforeDeparture(start, end)) {
@@ -36,41 +42,104 @@ public class AvailabilityService {
         for (Reservation existingReservation : existingReservations) {
             LocalDate existingArrival = existingReservation.getArrival();
             LocalDate existingDeparture = existingReservation.getDeparture();
-            // case 1
+            // Case 1
+            //                  arrival        departure
+            // Existing Reservation         +--------------+
+            //                              |              |
+            // Time Line  _______________________________________________
+            //                              |              |
+            // Incoming Reservation         +--------------+
+            //
             if (start.isEqual(existingArrival) && end.isEqual(
                     existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 2
+                // Case 2
+                //                  arrival        departure
+                // Existing Reservation         +--------------+
+                //                              |              |
+                // Time Line  _______________________________________________
+                //                              |                  |
+                // Incoming Reservation         +------------------+
+                //
             } else if (start.isEqual(existingArrival) && isBetweenDates(start, end, existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 3
+                // Case 3
+                //                  arrival        departure
+                // Existing Reservation         +--------------+
+                //                              |              |
+                // Time Line  _______________________________________________
+                //                           |                 |
+                // Incoming Reservation      +-----------------+
+                //
             } else if (isBetweenDates(start, end, existingArrival) && end.isEqual(
                     existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 4
+                // Case 4
+                //                  arrival        departure
+                // Existing Reservation            +--------+
+                //                                 |        |
+                // Time Line  _______________________________________________
+                //                              |              |
+                // Incoming Reservation         +--------------+
+                //
             } else if (start.isBefore(existingArrival) && end.isAfter(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 5
+                // Case 5
+                //                  arrival        departure
+                // Existing Reservation              +--------------+
+                //                                   |              |
+                // Time Line  _______________________________________________
+                //                              |              |
+                // Incoming Reservation         +--------------+
+                //
             } else if (existingArrival.isAfter(start) && isBetweenDates(existingArrival, existingDeparture, end)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 6
+                // Case 6
+                //                  arrival        departure
+                // Existing Reservation         +--------------+
+                //                              |              |
+                // Time Line  _______________________________________________
+                //                                  |              |
+                // Incoming Reservation             +--------------+
+                //
             } else if (isBetweenDates(start, end, existingDeparture) && end.isAfter(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 7
+                // Case 7
+                //                  arrival        departure
+                // Existing Reservation         +--------------+
+                //                              |              |
+                // Time Line  _______________________________________________
+                //                                 |        |
+                // Incoming Reservation            +--------+
+                //
             } else if (start.isAfter(existingArrival) && end.isBefore(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 8
+                // Case 8
+                //                  arrival        departure
+                // Existing Reservation         +--------------+
+                //                              |              |
+                // Time Line  _______________________________________________
+                //                                  |          |
+                // Incoming Reservation             +----------+
+                //
             } else if (isBetweenDates(existingArrival, existingDeparture, start) && end.isEqual(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // case 9
+                // Case 9
+                //                  arrival        departure
+                // Existing Reservation         +--------------+
+                //                              |              |
+                // Time Line  _______________________________________________
+                //                              |          |
+                // Incoming Reservation         +----------+
+                //
             } else if(start.isEqual(existingArrival) && isBetweenDates(existingArrival, existingDeparture, end)) {
                 isDateRangeAvailable = false;
                 break;
