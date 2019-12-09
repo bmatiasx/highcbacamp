@@ -39,7 +39,7 @@ import java.util.Set;
 import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationBasedInWrapper;
 import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationWrapper;
 import static com.andromedacodelab.HighCbaCamp.TestUtil.parseFileToJson;
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.customParseStringToLocalDateTime;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.customParseStringToLocalDate;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -274,8 +274,8 @@ public class ReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         is("Updated reservation with bookingId: " + reservation.getBookingId())));
-        Assert.assertEquals(customParseStringToLocalDateTime("2020-05-15"), reservation.getArrival());
-        Assert.assertEquals(customParseStringToLocalDateTime("2020-05-17"), reservation.getDeparture());
+        Assert.assertEquals(customParseStringToLocalDate("2020-05-15"), reservation.getArrival());
+        Assert.assertEquals(customParseStringToLocalDate("2020-05-17"), reservation.getDeparture());
     }
 
     @Test

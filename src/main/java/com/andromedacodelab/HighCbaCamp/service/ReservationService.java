@@ -18,13 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
-
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.addWholeDayInHours;
 
 @Service
 public class ReservationService {
@@ -55,7 +52,7 @@ public class ReservationService {
      */
     public Reservation findReservationByBookingId(Integer bookingId) {
         Reservation reservation = getReservation(bookingId);
-        reservation.setDeparture(addWholeDayInHours(reservation.getDeparture()));
+        reservation.setDeparture(reservation.getDeparture());
         return reservation;
     }
 
@@ -175,13 +172,13 @@ public class ReservationService {
      * @param arrival date to validate
      * @param departure date to validate against the above one
      */
-    public boolean validateDateRangeConstraints(LocalDateTime arrival, LocalDateTime departure) {
+    public boolean validateDateRangeConstraints(LocalDate arrival, LocalDate departure) {
         LocalDate now = LocalDate.now();
-        Period period = Period.between(arrival.toLocalDate(), departure.toLocalDate());
+        Period period = Period.between(arrival, departure);
         int dayDifference = period.getDays();
 
-        if (arrival.toLocalDate().isEqual(now.plusDays(1)) || arrival.toLocalDate().isBefore(now.plusDays(1))
-                || arrival.toLocalDate().isBefore(now.plusMonths(1))) {
+        if (arrival.isEqual(now.plusDays(1)) || arrival.isBefore(now.plusDays(1))
+                || arrival.isBefore(now.plusMonths(1))) {
             throw new ReservationOutOfTermException();
         }
         return dayDifference > 4;
@@ -194,8 +191,8 @@ public class ReservationService {
      * @param oldReservationDate the old reservation date
      * @return true if the dates are equal
      */
-    private boolean validateReservationDatesAreEqual(LocalDateTime newReservationDate, LocalDateTime oldReservationDate) {
-        return newReservationDate.toLocalDate().isEqual(oldReservationDate.toLocalDate());
+    private boolean validateReservationDatesAreEqual(LocalDate newReservationDate, LocalDate oldReservationDate) {
+        return newReservationDate.isEqual(oldReservationDate);
     }
 
     /**

@@ -14,9 +14,11 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS;
 
 @Entity
@@ -29,12 +31,12 @@ public class Reservation {
     private Integer bookingId;
 
     @Column(name = "\"ARRIVAL\"")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)
-    private  LocalDateTime arrival;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY)
+    private  LocalDate arrival;
 
     @Column(name = "\"DEPARTURE\"")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)
-    private LocalDateTime departure;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = YEAR_MONTH_DAY)
+    private LocalDate departure;
 
     @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "\"STATUS_ID\"")
@@ -57,19 +59,19 @@ public class Reservation {
         this.bookingId = bookingId;
     }
 
-    public LocalDateTime getArrival() {
+    public LocalDate getArrival() {
         return arrival;
     }
 
-    public void setArrival(LocalDateTime arrival) {
+    public void setArrival(LocalDate arrival) {
         this.arrival = arrival;
     }
 
-    public LocalDateTime getDeparture() {
+    public LocalDate getDeparture() {
         return departure;
     }
 
-    public void setDeparture(LocalDateTime departure) {
+    public void setDeparture(LocalDate departure) {
         this.departure = departure;
     }
 

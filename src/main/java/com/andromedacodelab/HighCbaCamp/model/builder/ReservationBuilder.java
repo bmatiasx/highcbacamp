@@ -4,7 +4,7 @@ import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
 public class ReservationBuilder {
@@ -23,12 +23,12 @@ public class ReservationBuilder {
         return this;
     }
 
-    public ReservationBuilder withArrivalDate(LocalDateTime arrivalDate) {
+    public ReservationBuilder withArrivalDate(LocalDate arrivalDate) {
         reservation.setArrival(arrivalDate);
         return this;
     }
 
-    public ReservationBuilder withDepartureDate(LocalDateTime departureDate) {
+    public ReservationBuilder withDepartureDate(LocalDate departureDate) {
         reservation.setDeparture(departureDate);
         return this;
     }

@@ -4,20 +4,17 @@ import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.RESOURCE_NOT_EXISTS_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.SERVER_ERROR_MESSAGE;
-import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Component
 public class CustomErrorAttributes extends DefaultErrorAttributes {
-    private static final DateFormat dateFormat = new SimpleDateFormat(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS);
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         // Let Spring handle the error first, we will modify later
@@ -26,9 +23,9 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
         // format & update timestamp
         Object timestamp = errorAttributes.get("timestamp");
         if (timestamp == null) {
-            errorAttributes.put("timestamp", dateFormat.format(new Date()));
+            errorAttributes.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")));
         } else {
-            errorAttributes.put("timestamp", dateFormat.format((Date) timestamp));
+            errorAttributes.put("timestamp", timestamp);
         }
 
         if (errorAttributes.get("status").equals(NOT_FOUND.value())) {

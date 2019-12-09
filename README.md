@@ -116,3 +116,9 @@ The persistence was made using H2 in-memory data base. The url to access
 the db console is `http://localhost:8080/h2`.
 With Driver class `org.h2.Driver`, JDBC url `jdbc:h2:mem:campdb`,
  username `sa` and password empty.
+ 
+ ## Endpoints
+ The API endpoints and specifications can be found at `http://localhost:8080/swagger-ui.html` page.
+ Also the _javadoc_ maven plugin incorporated allows to get an API doc by typing in the CLI the command:
+ `mvn javadoc:javadoc`
+ Such _javadoc_ is located at `/target/site/apidocs/` directory.

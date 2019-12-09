@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -29,13 +30,13 @@ import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.STATUS_PARA
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
 
 public class CampApiUtil {
-    public static LocalDateTime convertToLocalDateTime(Date dateToConvert) {
+    public static LocalDate convertToLocalDateTime(Date dateToConvert) {
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+                .toLocalDate();
     }
 
-    public static LocalDateTime customParseStringToLocalDateTime(String dateToConvert) {
+    public static LocalDate customParseStringToLocalDate(String dateToConvert) {
         DateFormat formatter = new SimpleDateFormat(YEAR_MONTH_DAY);
         Date date;
         try {
@@ -54,16 +55,12 @@ public class CampApiUtil {
         return map;
     }
 
-    public static boolean validateArrivalIsBeforeDeparture(@NotNull LocalDateTime start, @NotNull LocalDateTime end) {
+    public static boolean validateArrivalIsBeforeDeparture(@NotNull LocalDate start, @NotNull LocalDate end) {
         return start.isBefore(end) || start.isEqual(end);
     }
 
-    public static boolean isBetweenDates(LocalDateTime start, LocalDateTime end, LocalDateTime target) {
+    public static boolean isBetweenDates(LocalDate start, LocalDate end, LocalDate target) {
         return !(target.isBefore(start) || target.isAfter(end));
-    }
-
-    public static LocalDateTime addWholeDayInHours(LocalDateTime endDay) {
-        return endDay.plusHours(23).plusMinutes(59);
     }
 
     public static Set<Guest> convertListToSet(List<Map<String, String>> guests) {
@@ -124,8 +121,8 @@ public class CampApiUtil {
             }
 
             reservationWrapper = new ReservationWrapper(null,
-                    customParseStringToLocalDateTime(arrival),
-                    customParseStringToLocalDateTime(departure),
+                    customParseStringToLocalDate(arrival),
+                    customParseStringToLocalDate(departure),
                     guestSet, "");
         } else {
             String bookingId = request.get("bookingId").toString();
@@ -135,8 +132,8 @@ public class CampApiUtil {
 
             reservationWrapper =  new ReservationWrapper(
                     Integer.parseInt(bookingId),
-                    customParseStringToLocalDateTime(arrival),
-                    customParseStringToLocalDateTime(departure),
+                    customParseStringToLocalDate(arrival),
+                    customParseStringToLocalDate(departure),
                     convertListToSet(guests),
                     statusName);
         }

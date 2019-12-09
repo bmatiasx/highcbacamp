@@ -12,12 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.convertToLocalDateTime;
-import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/availability")
@@ -32,42 +27,29 @@ public class AvailabilityController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<?> checkAvailabilityForDates(@RequestParam(value = "start", required = false)
-                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
-                                                            pattern = YEAR_MONTH_DAY)
-                                                            Date startDate,
+                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                            LocalDate startDate,
                                                             @RequestParam(value = "end", required = false)
-                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
-                                                            pattern = YEAR_MONTH_DAY)
-                                                            Date endDate) {
+                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                            LocalDate  endDate) {
 
-        LocalDateTime start;
-        LocalDateTime end;
         if (startDate == null && endDate == null) {
             /* Use the default date range which is 1 month*/
-            start = LocalDateTime.now();
-            end = start.plusMonths(1);
+            startDate = LocalDate.now();
+            endDate = startDate.plusMonths(1);
         } else if (endDate == null){
-            start = convertToLocalDateTime(startDate);
-            end = start.plusMonths(1);
+            endDate = startDate.plusMonths(1);
         } else if (startDate == null) {
-            end = convertToLocalDateTime(endDate);
-            start = end.minusMonths(1);
-        } else {
-            start = convertToLocalDateTime(startDate);
-            end = convertToLocalDateTime(endDate);
+            startDate = endDate.minusMonths(1);
         }
 
-        if (availabilityService.isReservationDateRangeAvailable(start, end)) {
+        if (availabilityService.isReservationDateRangeAvailable(startDate, endDate)) {
             return new ResponseEntity<>(
-                    CampApiUtil.availabilityResponseMessage("The date range [arrival: " +
-                            start.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) +
-                            ", departure: " + end.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) + "] is available!"),
-                    HttpStatus.OK);
+                    CampApiUtil.availabilityResponseMessage("The date range [arrival: " + startDate +
+                            ", departure: " + endDate + "] is available!"), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(CampApiUtil.availabilityResponseMessage("The date range [arrival: " +
-                    start.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) +
-                    ", departure: " + end.format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY)) + "] is not available")
-                    , HttpStatus.CONFLICT);
+                    startDate + ", departure: " + endDate + "] is not available"), HttpStatus.CONFLICT);
         }
     }
 }

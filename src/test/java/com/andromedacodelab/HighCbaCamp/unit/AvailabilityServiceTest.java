@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,8 +41,8 @@ public class AvailabilityServiceTest {
 
     @Test
     public void givenDateRange_whenFindAvailability_thenReturnTrue() {
-        LocalDateTime start = CampApiUtil.customParseStringToLocalDateTime("2020-03-10");
-        LocalDateTime end = CampApiUtil.customParseStringToLocalDateTime("2020-03-13");
+        LocalDate start = CampApiUtil.customParseStringToLocalDate("2020-03-10");
+        LocalDate end = CampApiUtil.customParseStringToLocalDate("2020-03-13");
 
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
                 .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
@@ -83,8 +83,8 @@ public class AvailabilityServiceTest {
     @Test
     public void givenDateRange_whenFindAvailability_thenReturnFalse() {
         // case overlapping dates
-        LocalDateTime start = CampApiUtil.customParseStringToLocalDateTime("2020-05-21");
-        LocalDateTime end = CampApiUtil.customParseStringToLocalDateTime("2020-05-24");
+        LocalDate start = CampApiUtil.customParseStringToLocalDate("2020-05-21");
+        LocalDate end = CampApiUtil.customParseStringToLocalDate("2020-05-24");
 
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
                 .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
@@ -124,8 +124,8 @@ public class AvailabilityServiceTest {
     @Test
     public void givenDateRange_whenFindAvailability_thenReturnFalse2ndScenario() {
         // case overlapping dates
-        LocalDateTime start = CampApiUtil.customParseStringToLocalDateTime("2020-05-24");
-        LocalDateTime end = CampApiUtil.customParseStringToLocalDateTime("2020-05-27");
+        LocalDate start = CampApiUtil.customParseStringToLocalDate("2020-05-24");
+        LocalDate end = CampApiUtil.customParseStringToLocalDate("2020-05-27");
 
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
                 .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
@@ -164,8 +164,8 @@ public class AvailabilityServiceTest {
     @Test
     public void givenDateRange_whenFindAvailability_thenReturnFalse3rdScenario() {
         // case overlapping dates in the end of existing reservation
-        LocalDateTime start = CampApiUtil.customParseStringToLocalDateTime("2020-05-30");
-        LocalDateTime end = CampApiUtil.customParseStringToLocalDateTime("2020-06-01");
+        LocalDate start = CampApiUtil.customParseStringToLocalDate("2020-05-30");
+        LocalDate end = CampApiUtil.customParseStringToLocalDate("2020-06-01");
 
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
                 .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
@@ -204,8 +204,8 @@ public class AvailabilityServiceTest {
     @Test(expected = InvalidDateRangeException.class)
     public void givenInvalidDateRange_whenFindAvailability_thenReturnException() {
         // case invalid date ranges
-        LocalDateTime start = CampApiUtil.customParseStringToLocalDateTime("2020-06-15");
-        LocalDateTime end = CampApiUtil.customParseStringToLocalDateTime("2020-04-20");
+        LocalDate start = CampApiUtil.customParseStringToLocalDate("2020-06-15");
+        LocalDate end = CampApiUtil.customParseStringToLocalDate("2020-04-20");
 
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
                 .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();
@@ -244,8 +244,8 @@ public class AvailabilityServiceTest {
     @Test
     public void givenDateRangeWithCancelledReservation_whenFindAvailability_thenReturnTrue() {
         // case one cancelled reservation
-        LocalDateTime start = CampApiUtil.customParseStringToLocalDateTime("2020-05-28");
-        LocalDateTime end = CampApiUtil.customParseStringToLocalDateTime("2020-05-30");
+        LocalDate start = CampApiUtil.customParseStringToLocalDate("2020-05-28");
+        LocalDate end = CampApiUtil.customParseStringToLocalDate("2020-05-30");
 
         Guest guest1 = new GuestBuilder().withId(1).withFirstName("Matt").withLastName("Damon")
                 .withEmail("mattdamon@hotmail.com").withIsReservationHolder(true).build();

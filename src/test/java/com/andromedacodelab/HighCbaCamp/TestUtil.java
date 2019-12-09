@@ -7,19 +7,17 @@ import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.model.builder.ReservationBuilder;
 import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.customParseStringToLocalDateTime;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.customParseStringToLocalDate;
 
 public class TestUtil {
     public static Reservation createReservationMock() {
@@ -36,16 +34,16 @@ public class TestUtil {
 
         return new ReservationBuilder()
                 .withBookingId(1)
-                .withArrivalDate(customParseStringToLocalDateTime(arrival))
-                .withDepartureDate(customParseStringToLocalDateTime(departure))
+                .withArrivalDate(customParseStringToLocalDate(arrival))
+                .withDepartureDate(customParseStringToLocalDate(departure))
                 .withStatus(status)
                 .withGuests(guests)
                 .build();
     }
 
     public static ReservationWrapper createNewReservationWrapper(String arrivalDate, String departureDate, Set<Guest> guests) {
-        LocalDateTime arrival = CampApiUtil.customParseStringToLocalDateTime(arrivalDate);
-        LocalDateTime departure = CampApiUtil.customParseStringToLocalDateTime(departureDate);
+        LocalDate arrival = CampApiUtil.customParseStringToLocalDate(arrivalDate);
+        LocalDate departure = CampApiUtil.customParseStringToLocalDate(departureDate);
 
         ReservationStatus status = new ReservationStatus(2, "CONFIRMED");
 
