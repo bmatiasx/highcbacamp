@@ -1,9 +1,6 @@
 package com.andromedacodelab.HighCbaCamp.util;
 
 import com.andromedacodelab.HighCbaCamp.exception.DateFormatIsInvalidException;
-import com.andromedacodelab.HighCbaCamp.exception.DateRangeNotAcceptedException;
-import com.andromedacodelab.HighCbaCamp.exception.DateRangeNotAvailableException;
-import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
 import com.andromedacodelab.HighCbaCamp.exception.ParamsMissingException;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
@@ -17,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +25,6 @@ import java.util.Set;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.ARRIVAL_PARAM_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.BOOKING_ID_PARAM_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.DEPARTURE_PARAM_MISSING_MESSAGE;
-import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.GUEST_PARAM_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.STATUS_PARAM_MISSING_MESSAGE;
 import static com.andromedacodelab.HighCbaCamp.util.RestApiConstants.YEAR_MONTH_DAY;
 
@@ -41,7 +37,7 @@ public class CampApiUtil {
 
     public static LocalDateTime customParseStringToLocalDateTime(String dateToConvert) {
         DateFormat formatter = new SimpleDateFormat(YEAR_MONTH_DAY);
-        Date date = new Date();
+        Date date;
         try {
             date = formatter.parse(dateToConvert);
         } catch (ParseException e) {
@@ -94,15 +90,23 @@ public class CampApiUtil {
         return guestSet;
     }
 
-    public static ReservationWrapper extractReservationFromPutRequest(JSONObject request, boolean isCreate) {
+    public static ReservationWrapper extractReservationFromRequest(JSONObject request, boolean isCreate) {
         ReservationWrapper reservationWrapper;
         List<String> paramListForValidate = new ArrayList<>();
+        if (request.size() == 0) throw new ParamsMissingException();
+
+        if (request.get("arrival") == null
+            || request.get("departure") == null)
+        throw new ParamsMissingException(Arrays.asList("arrival", "departure"));
 
         String arrival = request.get("arrival").toString();
         String departure = request.get("departure").toString();
         List guests = (List) request.get("guests");
 
         if(isCreate) {
+            if (request.get("firstName") == null || request.get("lastName") == null
+                    || request.get("email") == null)
+                throw new ParamsMissingException(Arrays.asList("firstName", "lastName", "email"));
             String firstName = request.get("firstName").toString();
             String lastName = request.get("lastName").toString();
             String email = request.get("email").toString();

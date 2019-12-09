@@ -1,4 +1,4 @@
-package com.andromedacodelab.HighCbaCamp.service;
+package com.andromedacodelab.HighCbaCamp.unit;
 
 import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
@@ -6,6 +6,7 @@ import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
+import com.andromedacodelab.HighCbaCamp.service.AvailabilityService;
 import com.andromedacodelab.HighCbaCamp.util.CampApiUtil;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
 import org.junit.Assert;
@@ -26,7 +27,7 @@ import java.util.Set;
 import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationBasedInWrapper;
 import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationWrapper;
 
-public class AvailabilityServiceTests {
+public class AvailabilityServiceTest {
     @InjectMocks
     private AvailabilityService availabilityService;
 

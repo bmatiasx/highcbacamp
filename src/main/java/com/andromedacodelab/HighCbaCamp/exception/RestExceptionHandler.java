@@ -84,15 +84,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(restApiError, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DateRangeNotAvailableException .class)
-    protected ResponseEntity<Object> handleDateRangeNotAvailableException(DateRangeNotAvailableException ex) {
-        RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
-                HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), DATE_RANGE_NOT_AVAILABLE_MESSAGE);
-        return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
-    }
-
-
     @ExceptionHandler(ReservationOutOfTermException .class)
     protected ResponseEntity<Object> handleReservationOutOfTermException(ReservationOutOfTermException ex) {
         RestApiError restApiError = new RestApiError(
@@ -101,20 +92,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(NotSavedReservationException .class)
-    protected ResponseEntity<Object> handleNotSavedReservationException(NotSavedReservationException ex) {
-        RestApiError restApiError = new RestApiError(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
-                HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), RESERVATION_NOT_SAVED_MESSAGE);
-        return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
-    }
-
     @ExceptionHandler(InvalidReservationStatusException .class)
     protected ResponseEntity<Object> handleNotSavedReservationException(InvalidReservationStatusException ex) {
         RestApiError restApiError = new RestApiError(
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern(YEAR_MONTH_DAY_HOURS_MINUTES_SECONDS)),
-                HttpStatus.CONFLICT.value(), HttpStatus.CONFLICT.getReasonPhrase(), INVALID_RESERVATION_STATUS_MESSAGE);
-        return new ResponseEntity<>(restApiError, HttpStatus.CONFLICT);
+                HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(), INVALID_RESERVATION_STATUS_MESSAGE);
+        return new ResponseEntity<>(restApiError, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ReservationCancelledException .class)

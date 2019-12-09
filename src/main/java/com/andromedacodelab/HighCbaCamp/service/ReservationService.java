@@ -149,6 +149,7 @@ public class ReservationService {
     }
 
     public Reservation updateReservationStatus(Integer bookingId, Integer newStatusId) {
+        lock.lock();
         Reservation oldReservation = getReservation(bookingId);
 
         ReservationStatus newReservationStatus = reservationStatusesRepository.getOne(newStatusId);
@@ -156,14 +157,20 @@ public class ReservationService {
         if (IntStream.rangeClosed(1, 4).noneMatch(s -> s == newStatusId)) throw new InvalidReservationStatusException();
 
         oldReservation.setStatus(newReservationStatus);
-
-        return reservationRepository.save(oldReservation);
+        try {
+            return reservationRepository.save(oldReservation);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+        return oldReservation;
     }
 
     /**
      * Validates the following scenarios:
      * 1. The campsite can be reserved for a maximum of 3 days
-     * 2. The campsite can be reserved for a minimum of 1 day ahead of arrival and up to 1 month in advance
+     * 2. The campsite can be reserved minimum of 1 day ahead of arrival and up to 1 month in advance
      *
      * @param arrival date to validate
      * @param departure date to validate against the above one
@@ -173,12 +180,10 @@ public class ReservationService {
         Period period = Period.between(arrival.toLocalDate(), departure.toLocalDate());
         int dayDifference = period.getDays();
 
-        if ((arrival.toLocalDate().isEqual(now.minusDays(1)) || arrival.toLocalDate().isBefore(now.minusDays(1)))
-                || (arrival.toLocalDate().isEqual(now.minusMonths(1)) || arrival.toLocalDate().isBefore(
-                now.minusMonths(1)))) {
+        if (arrival.toLocalDate().isEqual(now.plusDays(1)) || arrival.toLocalDate().isBefore(now.plusDays(1))
+                || arrival.toLocalDate().isBefore(now.plusMonths(1))) {
             throw new ReservationOutOfTermException();
         }
-
         return dayDifference > 4;
     }
 

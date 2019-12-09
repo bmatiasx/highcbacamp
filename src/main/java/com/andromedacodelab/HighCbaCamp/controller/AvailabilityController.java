@@ -35,7 +35,7 @@ public class AvailabilityController {
                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                             pattern = YEAR_MONTH_DAY)
                                                             Date startDate,
-                                                         @RequestParam(value = "end", required = false)
+                                                            @RequestParam(value = "end", required = false)
                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                             pattern = YEAR_MONTH_DAY)
                                                             Date endDate) {

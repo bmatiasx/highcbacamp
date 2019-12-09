@@ -5,7 +5,9 @@ import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class AvailabilityService {
 
         List<Reservation> existingReservations = reservationRepository.findAll();
         boolean isDateRangeAvailable = false;
+        if (existingReservations.size() == 0) isDateRangeAvailable = true;
 
         existingReservations.removeIf(r -> r.getStatus().getName().equals("CANCELLED"));
 
@@ -57,7 +60,7 @@ public class AvailabilityService {
                 isDateRangeAvailable = false;
                 break;
                 // case 5
-            } else if (isBetweenDates(start, end, existingArrival) &&
+            } else if (existingArrival.isAfter(start) &&
                     isBetweenDates(existingArrival, existingDeparture, addWholeDayInHours(end))) {
                 isDateRangeAvailable = false;
                 break;
@@ -80,17 +83,10 @@ public class AvailabilityService {
                     existingDeparture, addWholeDayInHours(end))) {
                 isDateRangeAvailable = false;
                 break;
-                // case 10
-            } else if(existingReservations.iterator().hasNext() &&
-                    isBetweenDates(existingArrival, existingDeparture, start) &&
-                    isBetweenDates(existingReservations.iterator().next().getArrival(),
-                            existingReservations.iterator().next().getDeparture(), addWholeDayInHours(end))) {
-                isDateRangeAvailable = false;
-                break;
-                // case 11 (success)
+                // case 10 (success)
             } else if (start.isAfter(existingDeparture)) {
                 isDateRangeAvailable = true;
-                // case 12 (success)
+                // case 11 (success)
             } else if (addWholeDayInHours(end).isBefore(existingDeparture)){
                 isDateRangeAvailable = true;
             }

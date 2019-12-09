@@ -1,6 +1,6 @@
 {
-  "arrival": "2020-08-01",
-  "departure": "2020-08-02",
+  "arrival": "2020-05-26",
+  "departure": "2020-05-27",
   "firstName": "Alex",
   "lastName": "Keit",
   "email": "alexkeit@gmail.com",
@@ -23,6 +23,5 @@
       "email": "nathan.east@gmail.com",
       "reservationHolder": false
     }
-
   ]
 }

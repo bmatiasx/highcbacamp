@@ -1,15 +1,24 @@
-package com.andromedacodelab.HighCbaCamp.controller;
+package com.andromedacodelab.HighCbaCamp.unit;
 
+import com.andromedacodelab.HighCbaCamp.controller.AvailabilityController;
+import com.andromedacodelab.HighCbaCamp.controller.ReservationController;
+import com.andromedacodelab.HighCbaCamp.exception.RestExceptionHandler;
 import com.andromedacodelab.HighCbaCamp.model.Guest;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
+import com.andromedacodelab.HighCbaCamp.service.AvailabilityService;
+import com.andromedacodelab.HighCbaCamp.service.GuestService;
+import com.andromedacodelab.HighCbaCamp.service.ReservationService;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -37,7 +46,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class AvailabilityControllerTests {
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+public class AvailabilityControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
@@ -45,6 +55,15 @@ public class AvailabilityControllerTests {
 
     @MockBean
     private ReservationRepository reservationRepository;
+
+    @MockBean
+    private ReservationService reservationService;
+
+    @MockBean
+    private ReservationController reservationController;
+
+    @MockBean
+    private GuestService guestService;
 
     private List<Reservation> reservationList;
 

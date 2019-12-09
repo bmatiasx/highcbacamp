@@ -1,6 +1,5 @@
 package com.andromedacodelab.HighCbaCamp.controller;
 
-import com.andromedacodelab.HighCbaCamp.exception.NotSavedReservationException;
 import com.andromedacodelab.HighCbaCamp.model.Reservation;
 import com.andromedacodelab.HighCbaCamp.service.ReservationService;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.extractReservationFromPutRequest;
+import static com.andromedacodelab.HighCbaCamp.util.CampApiUtil.extractReservationFromRequest;
 
 @RestController
 @RequestMapping("/api/reservation")
@@ -30,11 +29,6 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping("/hello")
-    public String getGreeting() {
-        return "Hello HighCbaCamp!";
-    }
-
     @GetMapping
     public Reservation findReservationByBookingId(@RequestParam("bookingId") Integer bookingId) {
         return  reservationService.findReservationByBookingId(bookingId);
@@ -42,21 +36,19 @@ public class ReservationController {
 
     @PostMapping(path = "/create")
     @ResponseBody
-    public ResponseEntity<String> createReservation(@RequestBody JSONObject request) throws Exception {
+    public ResponseEntity<String> createReservation(@RequestBody JSONObject request) {
 
-        ReservationWrapper reservationWrapper = extractReservationFromPutRequest(request, true);
+        ReservationWrapper reservationWrapper = extractReservationFromRequest(request, true);
         Reservation reservation = reservationService.createReservation(reservationWrapper);
-        if (reservation == null) throw new NotSavedReservationException();
 
         return ResponseEntity.ok("Reservation created successfully with bookingId: " + reservation.getBookingId());
     }
 
     @PutMapping(path = "/update")
-    public ResponseEntity<String> updateReservation(@RequestBody JSONObject request) throws Exception {
+    public ResponseEntity<String> updateReservation(@RequestBody JSONObject request) {
 
-        ReservationWrapper newReservation = extractReservationFromPutRequest(request, false);
+        ReservationWrapper newReservation = extractReservationFromRequest(request, false);
         Reservation updatedReservation = reservationService.updateReservation(newReservation);
-        if (updatedReservation == null) throw new NotSavedReservationException();
 
         return ResponseEntity.ok("Updated reservation with bookingId: " + updatedReservation.getBookingId());
     }

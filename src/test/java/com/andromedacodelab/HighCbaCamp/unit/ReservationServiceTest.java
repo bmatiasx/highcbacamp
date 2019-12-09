@@ -1,4 +1,4 @@
-package com.andromedacodelab.HighCbaCamp.service;
+package com.andromedacodelab.HighCbaCamp.unit;
 
 import com.andromedacodelab.HighCbaCamp.TestUtil;
 import com.andromedacodelab.HighCbaCamp.exception.InvalidDateRangeException;
@@ -8,6 +8,9 @@ import com.andromedacodelab.HighCbaCamp.model.ReservationStatus;
 import com.andromedacodelab.HighCbaCamp.model.builder.GuestBuilder;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationRepository;
 import com.andromedacodelab.HighCbaCamp.repository.ReservationStatusesRepository;
+import com.andromedacodelab.HighCbaCamp.service.AvailabilityService;
+import com.andromedacodelab.HighCbaCamp.service.GuestService;
+import com.andromedacodelab.HighCbaCamp.service.ReservationService;
 import com.andromedacodelab.HighCbaCamp.util.ReservationWrapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,7 +30,7 @@ import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationBase
 import static com.andromedacodelab.HighCbaCamp.TestUtil.createNewReservationWrapper;
 import static org.mockito.Mockito.when;
 
-public class ReservationServiceTests {
+public class ReservationServiceTest {
     @InjectMocks
     private ReservationService reservationService;
 
