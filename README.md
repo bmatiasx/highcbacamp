@@ -25,7 +25,7 @@ mvn clean test
 
 IDE output for coverage:
 
-![alt text](https://github.com/bmatiasx/highcbacamp/blob/master/src/test/resources/img/test_coverage.png)
+![test coverage](https://github.com/bmatiasx/highcbacamp/blob/master/src/test/resources/img/test__coverage.png)
 
 ### Concurrent test case
 The concurrency scenario can be run from CLI navigating to the project directory
