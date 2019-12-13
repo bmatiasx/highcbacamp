@@ -77,6 +77,7 @@ public class ReservationService {
         // Checks if the provided date range is available to create a reservation
         if (!availabilityService.isReservationDateRangeAvailable(
                 reservation.getArrival(), reservation.getDeparture())) {
+            if (lock.isLocked()) lock.unlock();
             throw new InvalidDateRangeException();
         }
 

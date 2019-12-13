@@ -46,6 +46,8 @@ Then the response looks like this:
 Reservation created successfully with bookingId: 1
 {"timestamp":"2019-12-08 06:16:45 PM","status":400,"error":"Bad 
 Request","message":"The chosen dates are not available. Please select others"}
+{"timestamp":"2019-12-08 06:16:45 PM","status":400,"error":"Bad 
+Request","message":"The chosen dates are not available. Please select others"}
 ````
 
 ### Load test
