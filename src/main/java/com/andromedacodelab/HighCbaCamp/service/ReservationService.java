@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
 @Service
@@ -32,7 +31,6 @@ public class ReservationService {
     private AvailabilityService availabilityService;
     private static final Integer CONFIRMED_STATUS = 2;
     private static final Integer CANCELLED_STATUS = 4;
-    private final ReentrantLock lock = new ReentrantLock(true);
 
     @Autowired
     public ReservationService(ReservationRepository reservationRepository, GuestService guestService,
@@ -63,8 +61,6 @@ public class ReservationService {
      * @return Reservation object with all details
      */
     public Reservation createReservation(ReservationWrapper reservationWrapper) {
-        // Lock the current operation for the holding thread
-        lock.lock();
         Reservation reservation = new ReservationBuilder()
                 .withArrivalDate(reservationWrapper.getArrival())
                 .withDepartureDate(reservationWrapper.getDeparture())
@@ -77,7 +73,6 @@ public class ReservationService {
         // Checks if the provided date range is available to create a reservation
         if (!availabilityService.isReservationDateRangeAvailable(
                 reservation.getArrival(), reservation.getDeparture())) {
-            if (lock.isLocked()) lock.unlock();
             throw new InvalidDateRangeException();
         }
 
@@ -90,8 +85,6 @@ public class ReservationService {
             reservationRepository.save(reservation);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
-        } finally {
-            lock.unlock();
         }
         return reservation;
     }
@@ -106,8 +99,6 @@ public class ReservationService {
     public Reservation updateReservation(ReservationWrapper reservationWrapped) {
         ReservationStatus status = reservationStatusesRepository.findByName(reservationWrapped.getStatusName());
 
-        // Lock the current operation for the holding thread
-        lock.lock();
         Reservation reservation = new ReservationBuilder()
                 .withBookingId(reservationWrapped.getBookingId())
                 .withArrivalDate(reservationWrapped.getArrival())
@@ -140,14 +131,11 @@ public class ReservationService {
             reservationRepository.save(oldReservation);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
-        } finally {
-            lock.unlock();
         }
         return oldReservation;
     }
 
     public Reservation updateReservationStatus(Integer bookingId, Integer newStatusId) {
-        lock.lock();
         Reservation oldReservation = getReservation(bookingId);
 
         ReservationStatus newReservationStatus = reservationStatusesRepository.getOne(newStatusId);
@@ -159,8 +147,6 @@ public class ReservationService {
             return reservationRepository.save(oldReservation);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
-        } finally {
-            lock.unlock();
         }
         return oldReservation;
     }
@@ -201,13 +187,10 @@ public class ReservationService {
      * @param id that belongs to the reservation to delete
      */
     public void delete(Integer id) {
-        lock.lock();
         try {
             reservationRepository.deleteById(id);
         } catch (NonExistentReservationForDeleteException ex) {
             throw new NonExistentReservationForDeleteException();
-        } finally {
-            lock.unlock();
         }
     }
 
