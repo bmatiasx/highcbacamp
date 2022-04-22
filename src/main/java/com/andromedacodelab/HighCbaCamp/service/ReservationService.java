@@ -25,10 +25,10 @@ import java.util.stream.IntStream;
 @Service
 public class ReservationService {
 
-    private ReservationRepository reservationRepository;
-    private ReservationStatusesRepository reservationStatusesRepository;
-    private GuestService guestService;
-    private AvailabilityService availabilityService;
+    private final ReservationRepository reservationRepository;
+    private final ReservationStatusesRepository reservationStatusesRepository;
+    private final GuestService guestService;
+    private final AvailabilityService availabilityService;
     private static final Integer CONFIRMED_STATUS = 2;
     private static final Integer CANCELLED_STATUS = 4;
 
@@ -156,7 +156,7 @@ public class ReservationService {
      * 1. The campsite can be reserved for a maximum of 3 days
      * 2. The campsite can be reserved minimum of 1 day ahead of arrival and up to 1 month in advance
      *
-     * @param arrival date to validate
+     * @param arrival   date to validate
      * @param departure date to validate against the above one
      */
     public boolean validateDateRangeConstraints(LocalDate arrival, LocalDate departure) {
@@ -184,6 +184,7 @@ public class ReservationService {
 
     /**
      * Deletes reservation by id
+     *
      * @param id that belongs to the reservation to delete
      */
     public void delete(Integer id) {
@@ -196,6 +197,7 @@ public class ReservationService {
 
     /**
      * Validates if the guests already exists, if no then creates new one(s)
+     *
      * @param guests set of reservation guests
      */
     private void doGuestExistInRecords(Set<Guest> guests) {
@@ -213,6 +215,7 @@ public class ReservationService {
 
     /**
      * Looks for a reservation by id
+     *
      * @param bookingId the reservation unique identifier
      * @return the corresponding reservation object
      */
@@ -222,8 +225,9 @@ public class ReservationService {
     }
 
     /**
-     *  Checks if the arrival/departure dates changed. If so,checks the availability again to update them if possible
-     * @param reservation the new reservation
+     * Checks if the arrival/departure dates changed. If so,checks the availability again to update them if possible
+     *
+     * @param reservation    the new reservation
      * @param oldReservation the old reservation
      */
     private void validateChangesInDateRange(Reservation reservation, Reservation oldReservation) {
