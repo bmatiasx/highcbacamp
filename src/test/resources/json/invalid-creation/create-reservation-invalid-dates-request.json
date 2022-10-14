@@ -1,6 +1,6 @@
 {
-  "arrival": "2020-08-14",
-  "departure": "2020-08-20",
+  "arrival": "2022-12-14",
+  "departure": "2022-12-20",
   "firstName": "Eros",
   "lastName": "Ramazzotti",
   "email": "rama@gmail.com",
@@ -23,6 +23,5 @@
       "email": "nathan.east@gmail.com",
       "reservationHolder": false
     }
-
   ]
 }

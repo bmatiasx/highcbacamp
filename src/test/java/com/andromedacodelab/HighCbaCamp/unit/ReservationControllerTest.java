@@ -126,13 +126,13 @@ public class ReservationControllerTest {
                 .withEmail("casey@hotmail.com").withIsReservationHolder(false).build();
         Set<Guest> guests2 = new HashSet<>(Arrays.asList(guest3, guest4));
 
-        ReservationWrapper wrapper1 = createNewReservationWrapper("2020-05-25", "2020-05-27",
+        ReservationWrapper wrapper1 = createNewReservationWrapper("2022-12-25", "2022-12-27",
                 guests1);
-        ReservationWrapper wrapper2 = createNewReservationWrapper("2020-05-28", "2020-05-30",
+        ReservationWrapper wrapper2 = createNewReservationWrapper("2022-12-28", "2022-12-30",
                 guests2);
-        ReservationWrapper wrapper3 = createNewReservationWrapper("2020-08-02", "2020-08-02",
+        ReservationWrapper wrapper3 = createNewReservationWrapper("2022-12-02", "2022-12-02",
                 guests1);
-        ReservationWrapper wrapper4 = createNewReservationWrapper("2020-08-04", "2020-08-06",
+        ReservationWrapper wrapper4 = createNewReservationWrapper("2022-12-04", "2022-12-06",
                 guests2);
 
         Reservation reservation1 = createNewReservationBasedInWrapper(wrapper1);

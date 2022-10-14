@@ -164,7 +164,8 @@ public class ReservationService {
         Period period = Period.between(arrival, departure);
         int dayDifference = period.getDays();
 
-        if (arrival.isEqual(now.plusDays(1)) || arrival.isBefore(now.plusDays(1))
+        if (arrival.isEqual(now.plusDays(1))
+                || arrival.isBefore(now.plusDays(1))
                 || arrival.isBefore(now.plusMonths(1))) {
             throw new ReservationOutOfTermException();
         }

@@ -1,4 +1,4 @@
-# High Cba Camping
+# High Cba Camp
 
 This REST API is designed to manage the reservations for the campsite in order to accomodate
 the incoming and potential guests.

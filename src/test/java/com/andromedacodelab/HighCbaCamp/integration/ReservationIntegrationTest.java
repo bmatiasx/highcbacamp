@@ -55,8 +55,8 @@ public class ReservationIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bookingId", is(bookingId)))
-                .andExpect(jsonPath("$.arrival", is("2020-05-10")))
-                .andExpect(jsonPath("$.departure", is("2020-05-12")));
+                .andExpect(jsonPath("$.arrival", is("2022-11-16")))
+                .andExpect(jsonPath("$.departure", is("2022-11-18")));
     }
 
     @Test

@@ -71,7 +71,7 @@ public class ReservationServiceTest {
                 .withEmail("ja@hotmail.com").withIsReservationHolder(false).build();
         Set<Guest> guests = new HashSet<>(Arrays.asList(guest1, guest2));
 
-        ReservationWrapper wrapper = createNewReservationWrapper("2020-05-20", "2020-05-23",
+        ReservationWrapper wrapper = createNewReservationWrapper("2022-12-20", "2022-12-23",
                 guests);
 
         Reservation reservation = createNewReservationBasedInWrapper(wrapper);
@@ -112,9 +112,9 @@ public class ReservationServiceTest {
         Set<Guest> guests2 = new HashSet<>(Arrays.asList(guest3, guest4));
 
         // case 2 overlapping reservations
-        ReservationWrapper wrapper1 = createNewReservationWrapper("2020-05-24", "2020-05-27",
+        ReservationWrapper wrapper1 = createNewReservationWrapper("2022-12-24", "2022-12-27",
                 guests1);
-        ReservationWrapper wrapper2 = createNewReservationWrapper("2020-05-23", "2020-05-27",
+        ReservationWrapper wrapper2 = createNewReservationWrapper("2022-12-23", "2022-12-27",
                 guests2);
 
         Reservation reservation1 = createNewReservationBasedInWrapper(wrapper1);
@@ -146,9 +146,9 @@ public class ReservationServiceTest {
                 .withEmail("casey@hotmail.com").withIsReservationHolder(false).build();
         Set<Guest> guests2 = new HashSet<>(Arrays.asList(guest3, guest4));
 
-        ReservationWrapper wrapper1 = createNewReservationWrapper("2020-05-20", "2020-05-22",
+        ReservationWrapper wrapper1 = createNewReservationWrapper("2022-12-20", "2022-12-22",
                 guests1);
-        ReservationWrapper wrapper2 = createNewReservationWrapper("2020-05-20", "2020-05-22",
+        ReservationWrapper wrapper2 = createNewReservationWrapper("2022-12-20", "2022-12-22",
                 guests2);
 
         Reservation reservation1 = createNewReservationBasedInWrapper(wrapper1);
@@ -189,9 +189,9 @@ public class ReservationServiceTest {
                 .withEmail("jalbarn@hotmail.com").withIsReservationHolder(false).build();
         Set<Guest> guests1 = new HashSet<>(Arrays.asList(guest1, guest2));
 
-        ReservationWrapper newReservationWrapper = createNewReservationWrapper("2020-05-20", "2020-05-22",
+        ReservationWrapper newReservationWrapper = createNewReservationWrapper("2022-12-20", "2022-12-22",
                 guests1);
-        ReservationWrapper oldReservationWrapper = createNewReservationWrapper("2020-05-20", "2020-05-22",
+        ReservationWrapper oldReservationWrapper = createNewReservationWrapper("2022-12-20", "2022-12-22",
                 guests1);
         newReservationWrapper.setBookingId(3);
         oldReservationWrapper.setBookingId(3);
@@ -237,9 +237,9 @@ public class ReservationServiceTest {
                 .withEmail("jalbarn@hotmail.com").withIsReservationHolder(false).build();
         Set<Guest> guests1 = new HashSet<>(Arrays.asList(guest1, guest2));
 
-        ReservationWrapper newReservationWrapper = createNewReservationWrapper("2020-05-15", "2020-05-17",
+        ReservationWrapper newReservationWrapper = createNewReservationWrapper("2022-12-15", "2022-12-17",
                 guests1);
-        ReservationWrapper oldReservationWrapper = createNewReservationWrapper("2020-05-20", "2020-05-22",
+        ReservationWrapper oldReservationWrapper = createNewReservationWrapper("2022-12-20", "2022-12-22",
                 guests1);
         newReservationWrapper.setBookingId(3);
         oldReservationWrapper.setBookingId(3);
