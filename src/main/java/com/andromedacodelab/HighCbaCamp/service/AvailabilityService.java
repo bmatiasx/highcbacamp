@@ -42,104 +42,41 @@ public class AvailabilityService {
         for (Reservation existingReservation : existingReservations) {
             LocalDate existingArrival = existingReservation.getArrival();
             LocalDate existingDeparture = existingReservation.getDeparture();
-            // Case 1
-            //                  arrival        departure
-            // Existing Reservation         +--------------+
-            //                              |              |
-            // Time Line  _______________________________________________
-            //                              |              |
-            // Incoming Reservation         +--------------+
-            //
+            // case 1
             if (start.isEqual(existingArrival) && end.isEqual(
                     existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 2
-                //                  arrival        departure
-                // Existing Reservation         +--------------+
-                //                              |              |
-                // Time Line  _______________________________________________
-                //                              |                  |
-                // Incoming Reservation         +------------------+
-                //
+                // case 2
             } else if (start.isEqual(existingArrival) && isBetweenDates(start, end, existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 3
-                //                  arrival        departure
-                // Existing Reservation         +--------------+
-                //                              |              |
-                // Time Line  _______________________________________________
-                //                           |                 |
-                // Incoming Reservation      +-----------------+
-                //
+                // case 3
             } else if (isBetweenDates(start, end, existingArrival) && end.isEqual(
                     existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 4
-                //                  arrival        departure
-                // Existing Reservation            +--------+
-                //                                 |        |
-                // Time Line  _______________________________________________
-                //                              |              |
-                // Incoming Reservation         +--------------+
-                //
+                // case 4
             } else if (start.isBefore(existingArrival) && end.isAfter(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 5
-                //                  arrival        departure
-                // Existing Reservation              +--------------+
-                //                                   |              |
-                // Time Line  _______________________________________________
-                //                              |              |
-                // Incoming Reservation         +--------------+
-                //
+                // case 5
             } else if (existingArrival.isAfter(start) && isBetweenDates(existingArrival, existingDeparture, end)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 6
-                //                  arrival        departure
-                // Existing Reservation         +--------------+
-                //                              |              |
-                // Time Line  _______________________________________________
-                //                                  |              |
-                // Incoming Reservation             +--------------+
-                //
+                // case 6
             } else if (isBetweenDates(start, end, existingDeparture) && end.isAfter(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 7
-                //                  arrival        departure
-                // Existing Reservation         +--------------+
-                //                              |              |
-                // Time Line  _______________________________________________
-                //                                 |        |
-                // Incoming Reservation            +--------+
-                //
+                // case 7
             } else if (start.isAfter(existingArrival) && end.isBefore(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 8
-                //                  arrival        departure
-                // Existing Reservation         +--------------+
-                //                              |              |
-                // Time Line  _______________________________________________
-                //                                  |          |
-                // Incoming Reservation             +----------+
-                //
+                // case 8
             } else if (isBetweenDates(existingArrival, existingDeparture, start) && end.isEqual(existingDeparture)) {
                 isDateRangeAvailable = false;
                 break;
-                // Case 9
-                //                  arrival        departure
-                // Existing Reservation         +--------------+
-                //                              |              |
-                // Time Line  _______________________________________________
-                //                              |          |
-                // Incoming Reservation         +----------+
-                //
+                // case 9
             } else if(start.isEqual(existingArrival) && isBetweenDates(existingArrival, existingDeparture, end)) {
                 isDateRangeAvailable = false;
                 break;
